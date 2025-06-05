@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
 import os
+from sqlalchemy import text
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -10,7 +11,8 @@ DATABASE_URL = os.getenv(
 engine = create_engine(DATABASE_URL, echo=False)
 
 def init_db():
-    SQLModel.metadata.create_all(engine)
+    """Initialize the database, creating all tables if they don't exist."""
+    SQLModel.metadata.create_all(engine)  # Only create if missing
 
 def get_session() -> Session:
     return Session(engine)

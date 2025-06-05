@@ -1,11 +1,30 @@
 import streamlit as st
 from app.db import init_db, get_session
-from app.models import Lead, Account, Stage
+from app.models import Lead, Account, Stage, AuditLog, User
 from sqlmodel import select, col, func
 import pandas as pd
 from io import StringIO
 import re
 import plotly.express as px
+from app.audit import audit
+from app.utils import to_json_safe
+from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
+from fastapi import Depends
+from app.auth import fastapi_users
+import requests
+
+# auto-fetch current user if token already stored
+if "access_token" in st.session_state and "current_user" not in st.session_state:
+    r = requests.get(
+        "http://localhost:8000/users/me",
+        cookies={"crm-auth": st.session_state.access_token},
+        timeout=5,
+    )
+    if r.status_code == 200:
+        st.session_state.current_user = r.json()
+    else:
+        st.session_state.pop("access_token")   # token expired → force re-login
 
 init_db()                              # ensure table exists
 st.title("Chat CRM – Slice 1")
@@ -45,7 +64,7 @@ if csv_file is not None:
                 # --- ensure account exists ---
                 acct = s.exec(select(Account).where(Account.name == acct_name)).first()
                 if not acct:
-                    acct = Account(name=acct_name)
+                    acct = Account(name=acct_name, user_id=st.session_state.get("current_user")["id"])
                     s.add(acct)
                     s.commit()  # needed so acct.id is generated
 
@@ -55,7 +74,7 @@ if csv_file is not None:
                     skipped += 1
                     continue
 
-                lead = Lead(email=email, account_id=acct.id, tags=tags)
+                lead = Lead(email=email, account_id=acct.id, tags=tags, user_id=st.session_state.get("current_user")["id"])
                 s.add(lead)
                 new_rows += 1
             s.commit()
@@ -68,14 +87,20 @@ if csv_file is not None:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-def handle(prompt: str) -> str:
+def secure_select_leads(session, user_id):
+    return session.exec(select(Lead).where(Lead.user_id == user_id))
+
+def handle(prompt: str, current_user) -> str:
+    if "access_token" not in st.session_state:
+        return "Please log in first."
     prompt = prompt.lower().strip()
+    user_id = current_user["id"]
 
     # ---- add account ----
     if prompt.startswith("add account"):
         name = prompt.replace("add account", "").strip()
         with get_session() as s:
-            s.add(Account(name=name))
+            s.add(Account(name=name, user_id=user_id))
             s.commit()
         return f"🏢 Account '{name}' created."
 
@@ -83,7 +108,8 @@ def handle(prompt: str) -> str:
     if prompt.startswith("add lead"):
         email = prompt.split()[-1]
         with get_session() as s:
-            s.add(Lead(email=email))
+            lead = Lead(email=email, user_id=user_id)
+            s.add(lead)
             s.commit()
         return f"✅ Lead {email} added."
 
@@ -96,7 +122,7 @@ def handle(prompt: str) -> str:
             acct = s.exec(select(Account).where(Account.name == acct_name)).first()
             if not acct:
                 return f"Account '{acct_name}' not found."
-            lead = s.exec(select(Lead).where(Lead.email == email)).first()
+            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_id)).first()
             if not lead:
                 return f"Lead '{email}' not found."
             lead.account_id = acct.id
@@ -109,7 +135,7 @@ def handle(prompt: str) -> str:
         parts = prompt.split()
         email, tag = parts[2], parts[3]
         with get_session() as s:
-            lead = s.exec(select(Lead).where(Lead.email == email)).first()
+            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_id)).first()
             if not lead:
                 return f"Lead '{email}' not found."
             tags_set = set(filter(None, map(str.strip, lead.tags.split(","))))
@@ -154,26 +180,41 @@ def handle(prompt: str) -> str:
     # ---- list all leads ----
     if prompt.startswith("list leads"):
         with get_session() as s:
-            rows = s.exec(select(Lead)).all()
+            rows = list(secure_select_leads(s, user_id))
         if not rows:
             return "No leads yet."
         return "\n".join(f"• {l.email}" for l in rows)
 
     # ---- set stage of lead ----
     if prompt.startswith("set stage of"):
-        # format: set stage of email to <stage>
         parts = prompt.split()
         email = parts[3]
         try:
             new_stage = Stage(parts[-1])
         except ValueError:
             return "Unknown stage. Use: new, qualified, proposal, won, lost."
+
         with get_session() as s:
             lead = s.exec(select(Lead).where(Lead.email == email)).first()
             if not lead:
                 return f"Lead '{email}' not found."
+
+            before = to_json_safe(lead.dict())
+
             lead.stage = new_stage
             s.commit()
+            after = to_json_safe(lead.dict())
+
+            s.add(
+                AuditLog(
+                    email=email,
+                    action="update_stage",
+                    before=before,
+                    after=after,
+                )
+            )
+            s.commit()
+
         return f"🎯 Stage of {email} set to {new_stage.value}."
 
     # ---- show pipeline kanban ----
@@ -199,12 +240,75 @@ def handle(prompt: str) -> str:
         )
         return fig  # return the figure object, no st.plotly_chart here
 
+    # ---- show audit for lead ----
+    if prompt.startswith("show audit for"):
+        email = prompt.replace("show audit for", "").strip()
+        with get_session() as s:
+            logs = (
+                s.exec(
+                    select(AuditLog)
+                    .where(AuditLog.email == email)
+                    .order_by(AuditLog.ts)
+                )
+                .all()
+            )
+        if not logs:
+            return f"No audit records for {email}."
+        lines = []
+        for log in logs:
+            ts = log.ts.strftime("%Y-%m-%d %H:%M")
+            lines.append(f"- {ts} | {log.action}")
+        return "\n".join(lines)
+
     return "Sorry, I don't understand yet."
+
+# ---- Streamlit sidebar login ----
+if "access_token" not in st.session_state:
+    st.sidebar.subheader("🔐 Sign in")
+    email = st.sidebar.text_input("Email")
+    password = st.sidebar.text_input("Password", type="password")
+    if st.sidebar.button("Login"):
+        COOKIE_NAME = "crm-auth"
+        resp = requests.post(
+            "http://localhost:8000/auth/jwt/login",
+            data={"username": email, "password": password},  # FastAPI-Users ≥ 14 uses username
+        )
+        print("LOGIN RESPONSE:", resp.status_code)
+        print("RESPONSE HEADERS:", dict(resp.headers))
+        print("RESPONSE COOKIES:", dict(resp.cookies))
+        if resp.status_code in (200, 204):
+            token = resp.cookies.get(COOKIE_NAME)
+            if token:
+                st.session_state.access_token = token        # 👍 saved
+                # fetch profile immediately
+                prof = requests.get(
+                    "http://localhost:8000/users/me",
+                    cookies={"crm-auth": token},
+                    timeout=5,
+                )
+                print("PROFILE RESPONSE:", prof.status_code)
+                print("PROFILE HEADERS:", dict(prof.headers))
+                if prof.status_code == 200:
+                    st.session_state.current_user = prof.json()
+                st.rerun()
+            else:
+                st.sidebar.error("Login cookie missing!")
+        else:
+            st.sidebar.error("Bad credentials")
+else:
+    st.sidebar.success("Logged in!")
+    # Update headers to use cookies instead of Authorization
+    headers = {"Cookie": f"crm-auth={st.session_state.access_token}"}
+    # pass headers into every request / session wrapper
 
 prompt = st.chat_input("Say something…")
 if prompt:
-    answer = handle(prompt)
-    st.session_state.history.append((prompt, answer))
+    user = st.session_state.get("current_user")
+    if not user:
+        st.chat_message("assistant").write("Please log in first.")
+    else:
+        answer = handle(prompt, user)
+        st.session_state.history.append((prompt, answer))
 
 for q, resp in st.session_state.history:
     st.chat_message("user").write(q)
