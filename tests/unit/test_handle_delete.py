@@ -2,6 +2,7 @@ from app.commands import handle
 from app.models import Account, Lead
 from app.database import get_session, init_db, engine
 from app.utils import to_uuid
+from sqlmodel import SQLModel
 import uuid
 
 def ctx():
