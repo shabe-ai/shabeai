@@ -16,8 +16,10 @@ def win_rate(leads: list[Lead]) -> float:
     """Calculate win rate from leads."""
     if not leads:
         return 0.0
-    won = sum(1 for l in leads if l.stage == Stage.won)
-    return won / len(leads)
+    won = sum(1 for l in leads if l.stage.value.lower() == "won")
+    total = sum(1 for l in leads if l.stage.value.lower() in
+                {"won", "lost", "proposal", "qualified", "new"})
+    return won / total if total else 0.0
 
 def find_account_by_name(accounts: list[Account], name: str) -> Account | None:
     """Find account by case-insensitive name match."""
