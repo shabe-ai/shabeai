@@ -266,22 +266,41 @@ def handle(prompt: str, current_user) -> str:
 
     # ---- delete account ----
     if prompt.startswith(("delete account", "remove account")):
-        acct_name = prompt.replace("delete account", "").replace("remove account","").strip().lower()
-        with get_session() as s:
-            acct = s.exec(
-                select(Account).where(Account.name == acct_name, Account.user_id == user_uuid)
-            ).first()
-            if not acct:
-                return f"Account '{acct_name}' not found."
-            # how many leads point at this account?
-            cnt = s.exec(
-                select(func.count()).where(Lead.account_id == acct.id)
-            ).one()          # <- returns an int
+        acct_name = (
+            prompt.replace("delete account", "")
+                  .replace("remove account", "")
+                  .strip()
+                  .lower()
+        )
 
-            if cnt:          # non-zero means still attached
-                return f"⚠️ Account has {cnt} lead(s). Delete them first."
+        with get_session() as s:
+            # ① try strict match (name + owner)
+            acct = s.exec(
+                select(Account).where(
+                    Account.name == acct_name,
+                    Account.user_id == user_uuid            # ← original filter
+                )
+            ).first()
+
+            # ② fallback: match on name only
+            if not acct:
+                acct = s.exec(select(Account).where(Account.name == acct_name)).first()
+                if not acct:
+                    return f"Account '{acct_name}' not found."
+                # If someone else owns it, block the delete
+                if acct.user_id != user_uuid:
+                    return "⛔ You don't own that account."
+
+            # still here → we own it
+            leads_cnt = s.exec(
+                select(func.count()).where(Lead.account_id == acct.id)
+            ).one()[0]
+            if leads_cnt:
+                return f"⚠️ Account has {leads_cnt} lead(s). Delete them first."
+
             s.delete(acct)
             s.commit()
+
         return f"🗑️ Account '{acct_name}' deleted."
 
     # ---- rename account ----
