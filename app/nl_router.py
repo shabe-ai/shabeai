@@ -42,22 +42,14 @@ def register(name: str, schema: dict):
     _schema("add_account", "Create a CRM account", {"name": {"type": "string"}}),
 )
 def add_account_nl(ctx, name: str):
-    # Ensure user_id is a UUID object
-    user = ctx["user"]
-    if isinstance(user["id"], str):
-        user["id"] = uuid.UUID(user["id"])
-    return ctx["handle"](f"add account {name}", user)
+    return ctx["handle"](f"add account {name}", ctx["user"])
 
 @register(
     "add_lead",
     _schema("add_lead", "Create a lead under current user", {"email": {"type": "string"}}),
 )
 def add_lead_nl(ctx, email: str):
-    # Ensure user_id is a UUID object
-    user = ctx["user"]
-    if isinstance(user["id"], str):
-        user["id"] = uuid.UUID(user["id"])
-    return ctx["handle"](f"add lead {email}", user)
+    return ctx["handle"](f"add lead {email}", ctx["user"])
 
 @register(
     "attach_lead",
@@ -68,33 +60,69 @@ def add_lead_nl(ctx, email: str):
     ),
 )
 def attach_lead_nl(ctx, email: str, account: str):
-    # Ensure user_id is a UUID object
-    user = ctx["user"]
-    if isinstance(user["id"], str):
-        user["id"] = uuid.UUID(user["id"])
-    return ctx["handle"](f"attach lead {email} to {account}", user)
+    return ctx["handle"](f"attach lead {email} to {account}", ctx["user"])
 
 @register(
     "report_funnel",
     _schema("report_funnel", "Show funnel chart", {}),
 )
 def funnel_nl(ctx):
-    # Ensure user_id is a UUID object
-    user = ctx["user"]
-    if isinstance(user["id"], str):
-        user["id"] = uuid.UUID(user["id"])
-    return ctx["handle"]("reports funnel", user)
+    return ctx["handle"]("reports funnel", ctx["user"])
 
 @register(
     "report_winrate",
     _schema("report_winrate", "Show win-rate text", {}),
 )
 def winrate_nl(ctx):
-    # Ensure user_id is a UUID object
-    user = ctx["user"]
-    if isinstance(user["id"], str):
-        user["id"] = uuid.UUID(user["id"])
-    return ctx["handle"]("reports winrate", user)
+    return ctx["handle"]("reports winrate", ctx["user"])
+
+# ---------- NEW TOOL REGISTRATIONS -----------------------------------------
+
+@register(
+    "find_leads",
+    _schema(
+        "find_leads",
+        "Search leads by tag, email or account name",
+        {"term": {"type": "string"}},
+    ),
+)
+def find_leads_nl(ctx, term: str):
+    return ctx["handle"](f"find {term}", ctx["user"])
+
+@register(
+    "list_leads",
+    _schema("list_leads", "List all leads for the current user", {}),
+)
+def list_leads_nl(ctx):
+    return ctx["handle"]("list leads", ctx["user"])
+
+@register(
+    "tag_lead",
+    _schema(
+        "tag_lead",
+        "Add a tag to a lead",
+        {"email": {"type": "string"}, "tag": {"type": "string"}},
+    ),
+)
+def tag_lead_nl(ctx, email: str, tag: str):
+    return ctx["handle"](f"tag lead {email} {tag}", ctx["user"])
+
+@register(
+    "update_stage",
+    _schema(
+        "update_stage",
+        "Change the pipeline stage of a lead",
+        {
+            "email": {"type": "string"},
+            "stage": {
+                "type": "string",
+                "enum": ["new", "qualified", "proposal", "won", "lost"],
+            },
+        },
+    ),
+)
+def update_stage_nl(ctx, email: str, stage: str):
+    return ctx["handle"](f"set stage of {email} to {stage}", ctx["user"])
 
 # ---------------------------------------------------------------------------
 

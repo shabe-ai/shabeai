@@ -1,3 +1,8 @@
+import os
+import uuid
+
+from dotenv import load_dotenv
+load_dotenv()
 import streamlit as st
 from app.db import init_db, get_session
 from app.models import Lead, Account, Stage, AuditLog, User
@@ -13,7 +18,17 @@ from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi import Depends
 from app.auth import fastapi_users
 from app.reports import funnel_counts, win_rate
+from app.nl_router import dispatch
 import requests
+
+def read_csv_any_encoding(raw: bytes) -> pd.DataFrame:
+    """Try common encodings to read CSV data."""
+    for enc in ("utf-8-sig", "utf-8", "latin-1"):
+        try:
+            return pd.read_csv(StringIO(raw.decode(enc)))
+        except UnicodeDecodeError:
+            continue
+    raise UnicodeDecodeError("Could not decode CSV with common encodings.")
 
 # auto-fetch current user if token already stored
 if "access_token" in st.session_state and "current_user" not in st.session_state:
@@ -46,7 +61,7 @@ csv_file = st.sidebar.file_uploader(
 
 if csv_file is not None:
     bytes_data = csv_file.getvalue()
-    df = pd.read_csv(StringIO(bytes_data.decode("utf-8")))
+    df = read_csv_any_encoding(bytes_data)
 
     required_cols = {"email", "account"}
     if not required_cols.issubset(df.columns):
@@ -65,7 +80,8 @@ if csv_file is not None:
                 # --- ensure account exists ---
                 acct = s.exec(select(Account).where(Account.name == acct_name)).first()
                 if not acct:
-                    acct = Account(name=acct_name, user_id=st.session_state.get("current_user")["id"])
+                    acct = Account(name=acct_name,
+                                 user_id=uuid.UUID(st.session_state["current_user"]["id"]))
                     s.add(acct)
                     s.commit()  # needed so acct.id is generated
 
@@ -75,7 +91,10 @@ if csv_file is not None:
                     skipped += 1
                     continue
 
-                lead = Lead(email=email, account_id=acct.id, tags=tags, user_id=st.session_state.get("current_user")["id"])
+                lead = Lead(email=email,
+                          account_id=acct.id,
+                          tags=tags,
+                          user_id=uuid.UUID(st.session_state["current_user"]["id"]))
                 s.add(lead)
                 new_rows += 1
             s.commit()
@@ -88,19 +107,22 @@ if csv_file is not None:
 if "history" not in st.session_state:
     st.session_state.history = []
 
-def secure_select_leads(session, user_id):
-    return session.exec(select(Lead).where(Lead.user_id == user_id))
+def secure_select_leads(session, user_uuid):
+    return session.exec(select(Lead).where(Lead.user_id == user_uuid))
 
 def handle(prompt: str, current_user) -> str:
     if "access_token" not in st.session_state:
         return "Please log in first."
+
     prompt = prompt.lower().strip()
-    user_id = current_user["id"]
+
+    # 🔑  consistently use a UUID object from here on
+    user_uuid = uuid.UUID(str(current_user["id"]))
 
     # ---- reports ----
     if prompt == "reports funnel":
         with get_session() as s:
-            counts = funnel_counts(s, user_id)
+            counts = funnel_counts(s, user_uuid)
         if not counts:
             return "No leads yet."
         # ordered by pipeline flow
@@ -112,14 +134,18 @@ def handle(prompt: str, current_user) -> str:
 
     if prompt == "reports winrate":
         with get_session() as s:
-            rate, won, total = win_rate(s, user_id)
+            rate, won, total = win_rate(s, user_uuid)
         return f"🏆 Win-rate (last 30 d): **{rate:.1f}%**  ({won}/{total})"
 
     # ---- add account ----
     if prompt.startswith("add account"):
         name = prompt.replace("add account", "").strip()
         with get_session() as s:
-            s.add(Account(name=name, user_id=user_id))
+            # case-folded lookup
+            existing = s.exec(select(Account).where(Account.name == name.lower())).first()
+            if existing:
+                return f"🤔 Account '{name}' already exists."
+            s.add(Account(name=name.lower(), user_id=user_uuid))
             s.commit()
         return f"🏢 Account '{name}' created."
 
@@ -127,7 +153,7 @@ def handle(prompt: str, current_user) -> str:
     if prompt.startswith("add lead"):
         email = prompt.split()[-1]
         with get_session() as s:
-            lead = Lead(email=email, user_id=user_id)
+            lead = Lead(email=email, user_id=user_uuid)
             s.add(lead)
             s.commit()
         return f"✅ Lead {email} added."
@@ -141,7 +167,7 @@ def handle(prompt: str, current_user) -> str:
             acct = s.exec(select(Account).where(Account.name == acct_name)).first()
             if not acct:
                 return f"Account '{acct_name}' not found."
-            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_id)).first()
+            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_uuid)).first()
             if not lead:
                 return f"Lead '{email}' not found."
             lead.account_id = acct.id
@@ -154,7 +180,7 @@ def handle(prompt: str, current_user) -> str:
         parts = prompt.split()
         email, tag = parts[2], parts[3]
         with get_session() as s:
-            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_id)).first()
+            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_uuid)).first()
             if not lead:
                 return f"Lead '{email}' not found."
             tags_set = set(filter(None, map(str.strip, lead.tags.split(","))))
@@ -199,7 +225,7 @@ def handle(prompt: str, current_user) -> str:
     # ---- list all leads ----
     if prompt.startswith("list leads"):
         with get_session() as s:
-            rows = list(secure_select_leads(s, user_id))
+            rows = list(secure_select_leads(s, user_uuid))
         if not rows:
             return "No leads yet."
         return "\n".join(f"• {l.email}" for l in rows)
@@ -214,7 +240,7 @@ def handle(prompt: str, current_user) -> str:
             return "Unknown stage. Use: new, qualified, proposal, won, lost."
 
         with get_session() as s:
-            lead = s.exec(select(Lead).where(Lead.email == email)).first()
+            lead = s.exec(select(Lead).where(Lead.email == email, Lead.user_id == user_uuid)).first()
             if not lead:
                 return f"Lead '{email}' not found."
 
@@ -279,6 +305,11 @@ def handle(prompt: str, current_user) -> str:
             lines.append(f"- {ts} | {log.action}")
         return "\n".join(lines)
 
+    # ---- NLP fallback ----
+    result = dispatch(prompt, ctx={"handle": handle, "user": current_user})
+    if result is not None:
+        return result
+
     return "Sorry, I don't understand yet."
 
 # ---- Streamlit sidebar login ----
@@ -290,11 +321,13 @@ if "access_token" not in st.session_state:
         COOKIE_NAME = "crm-auth"
         resp = requests.post(
             "http://localhost:8000/auth/jwt/login",
-            data={"username": email, "password": password},  # FastAPI-Users ≥ 14 uses username
+            data={"username": email, "password": password},   # exact keys
+            timeout=5,
         )
         print("LOGIN RESPONSE:", resp.status_code)
         print("RESPONSE HEADERS:", dict(resp.headers))
         print("RESPONSE COOKIES:", dict(resp.cookies))
+        print("RESPONSE CONTENT:", resp.text)  # Add this line to see error details
         if resp.status_code in (200, 204):
             token = resp.cookies.get(COOKIE_NAME)
             if token:
