@@ -365,22 +365,32 @@ def handle(prompt: str, current_user) -> str:
 
     # ---- delete account ----
     if prompt.startswith(("delete account", "remove account")):
-        acct_name = prompt.replace("delete account", "").replace("remove account","").strip().lower()
+        acct_name = (
+            prompt.replace("delete account", "")
+                  .replace("remove account", "")
+                  .strip()
+                  .lower()
+        )
+
         with get_session() as s:
-            acct = s.exec(
-                select(Account).where(Account.name == acct_name, Account.user_id == user_uuid)
-            ).first()
+            # fetch by name only, then check ownership
+            acct = s.exec(select(Account).where(Account.name == acct_name)).first()
             if not acct:
                 return f"Account '{acct_name}' not found."
-            # how many leads point at this account?
-            cnt = s.exec(
-                select(func.count()).where(Lead.account_id == acct.id)
-            ).one()          # <- returns an int
 
-            if cnt:          # non-zero means still attached
-                return f"⚠️ Account has {cnt} lead(s). Delete them first."
+            if to_uuid(acct.user_id) != user_uuid:        # works for str or UUID
+                return "⛔ You don't own that account."
+
+            leads_cnt = (
+                s.exec(select(func.count()).where(Lead.account_id == acct.id))
+                 .one()[0]
+            )
+            if leads_cnt:
+                return f"⚠️ Account has {leads_cnt} lead(s). Delete them first."
+
             s.delete(acct)
             s.commit()
+
         return f"🗑️ Account '{acct_name}' deleted."
 
     # ---- rename account ----
