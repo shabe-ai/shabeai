@@ -305,6 +305,46 @@ def handle(prompt: str, current_user) -> str:
             lines.append(f"- {ts} | {log.action}")
         return "\n".join(lines)
 
+    # ---- delete lead ----
+    if prompt.startswith(("delete lead", "remove lead")):
+        email = prompt.split()[-1]
+        with get_session() as s:
+            lead = s.exec(
+                select(Lead).where(Lead.email == email, Lead.user_id == user_uuid)
+            ).first()
+            if not lead:
+                return f"Lead '{email}' not found."
+            s.delete(lead)
+            s.add(
+                AuditLog(
+                    email=email,
+                    action="delete_lead",
+                    before={}, after={},    # keep minimal
+                )
+            )
+            s.commit()
+        return f"🗑️ Lead {email} deleted."
+
+    # ---- delete account ----
+    if prompt.startswith(("delete account", "remove account")):
+        acct_name = prompt.replace("delete account", "").replace("remove account","").strip().lower()
+        with get_session() as s:
+            acct = s.exec(
+                select(Account).where(Account.name == acct_name, Account.user_id == user_uuid)
+            ).first()
+            if not acct:
+                return f"Account '{acct_name}' not found."
+            # how many leads point at this account?
+            cnt = s.exec(
+                select(func.count()).where(Lead.account_id == acct.id)
+            ).one()          # <- returns an int
+
+            if cnt:          # non-zero means still attached
+                return f"⚠️ Account has {cnt} lead(s). Delete them first."
+            s.delete(acct)
+            s.commit()
+        return f"🗑️ Account '{acct_name}' deleted."
+
     # ---- NLP fallback ----
     result = dispatch(prompt, ctx={"handle": handle, "user": current_user})
     if result is not None:

@@ -124,6 +124,28 @@ def tag_lead_nl(ctx, email: str, tag: str):
 def update_stage_nl(ctx, email: str, stage: str):
     return ctx["handle"](f"set stage of {email} to {stage}", ctx["user"])
 
+@register(
+    "delete_lead",
+    _schema(
+        "delete_lead",
+        "Delete a lead owned by the current user",
+        {"email": {"type": "string"}},
+    ),
+)
+def delete_lead_nl(ctx, email: str):
+    return ctx["handle"](f"delete lead {email}", ctx["user"])
+
+@register(
+    "delete_account",
+    _schema(
+        "delete_account",
+        "Delete an account (must be empty)",
+        {"name": {"type": "string"}},
+    ),
+)
+def delete_account_nl(ctx, name: str):
+    return ctx["handle"](f"delete account {name}", ctx["user"])
+
 # ---------------------------------------------------------------------------
 
 def call_openai(prompt: str) -> Dict[str, Any] | None:
