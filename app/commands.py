@@ -126,7 +126,7 @@ def handle(prompt: str, current_user) -> str:
     # ---- list all leads ----
     if prompt.startswith("list leads"):
         with get_session() as s:
-            rows = list(secure_select_leads(s, user_uuid))
+            rows = s.exec(select(Lead).where(Lead.user_id == user_uuid)).all()
         if not rows:
             return "No leads yet."
         return "\n".join(f"• {l.email}" for l in rows)
@@ -274,27 +274,19 @@ def handle(prompt: str, current_user) -> str:
         )
 
         with get_session() as s:
-            # ① try strict match (name + owner)
-            acct = s.exec(
-                select(Account).where(
-                    Account.name == acct_name,
-                    Account.user_id == user_uuid            # ← original filter
-                )
-            ).first()
-
-            # ② fallback: match on name only
+            # fetch by name (case-folded)
+            acct = s.exec(select(Account).where(Account.name == acct_name)).first()
             if not acct:
-                acct = s.exec(select(Account).where(Account.name == acct_name)).first()
-                if not acct:
-                    return f"Account '{acct_name}' not found."
-                # If someone else owns it, block the delete
-                if acct.user_id != user_uuid:
-                    return "⛔ You don't own that account."
+                return f"Account '{acct_name}' not found."
 
-            # still here → we own it
-            leads_cnt = s.exec(
-                select(func.count()).where(Lead.account_id == acct.id)
-            ).one()[0]
+            # ownership check – works whether acct.user_id is str or UUID
+            if to_uuid(acct.user_id) != user_uuid:
+                return "⛔ You don't own that account."
+
+            leads_cnt = (
+                s.exec(select(func.count()).where(Lead.account_id == acct.id))
+                 .one()[0]
+            )
             if leads_cnt:
                 return f"⚠️ Account has {leads_cnt} lead(s). Delete them first."
 
