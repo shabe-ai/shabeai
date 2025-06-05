@@ -6,8 +6,13 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi_users_db_sqlmodel import SQLModelBaseUserDB, SQLModelUserDatabase
 from app.auth import auth_backend, fastapi_users
+from app.database import init_db
 
 app = FastAPI(title="Chat CRM API")
+
+@app.on_event("startup")
+async def startup_event():
+    init_db()
 
 # Configure CORS
 app.add_middleware(

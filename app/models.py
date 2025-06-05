@@ -7,6 +7,7 @@ from sqlalchemy.types import JSON
 from fastapi_users_db_sqlmodel import SQLModelBaseUserDB
 from sqlmodel import UniqueConstraint
 import uuid
+from app.database import get_session
 
 class Stage(str, enum.Enum):
     NEW = "new"
@@ -71,3 +72,7 @@ class AuditLog(SQLModel, table=True):
     before: dict[str, Any] | None = Field(sa_column=Column(JSON))
     after:  dict[str, Any] | None = Field(sa_column=Column(JSON))
     ts: datetime.datetime | None = Field(default_factory=datetime.datetime.utcnow)
+
+def get_db():
+    """Get a database session."""
+    return get_session()
