@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 import re
 import plotly.express as px
-from app.db import get_session
+from app.database import get_session
 from app.models import Lead, Account, Stage, AuditLog
 from sqlmodel import select, col, func
 from app.utils import to_json_safe, to_uuid
