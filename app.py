@@ -262,6 +262,44 @@ def handle(prompt: str, current_user) -> str:
 
         return f"🎯 Stage of {email} set to {new_stage.value}."
 
+    # ---- rename lead ----
+    # syntax:  "rename lead OLD@email.com to NEW@email.com"
+    if prompt.startswith("rename lead"):
+        parts = prompt.split(maxsplit=5)
+        if len(parts) != 5 or parts[3] != "to":
+            return "Usage: rename lead <old-email> to <new-email>"
+
+        old_email, new_email = parts[2].lower(), parts[4].lower()
+
+        with get_session() as s:
+            lead = s.exec(
+                select(Lead).where(Lead.email == old_email, Lead.user_id == user_uuid)
+            ).first()
+            if not lead:
+                return f"Lead '{old_email}' not found."
+
+            dup = s.exec(
+                select(Lead).where(Lead.email == new_email, Lead.user_id == user_uuid)
+            ).first()
+            if dup:
+                return f"Lead '{new_email}' already exists."
+
+            # audit snapshot
+            before = to_json_safe(lead.dict())
+
+            lead.email = new_email
+            s.commit()
+
+            s.add(AuditLog(
+                email=new_email,
+                action="rename_lead",
+                before=before,
+                after=to_json_safe(lead.dict()),
+            ))
+            s.commit()
+
+        return f"✏️  Lead e-mail updated to **{new_email}**."
+
     # ---- show pipeline kanban ----
     if prompt.startswith("show pipeline kanban"):
         with get_session() as s:
@@ -344,6 +382,36 @@ def handle(prompt: str, current_user) -> str:
             s.delete(acct)
             s.commit()
         return f"🗑️ Account '{acct_name}' deleted."
+
+    # ---- rename account ----
+    if prompt.startswith("rename account"):
+        # expected syntax:  "rename account OLD to NEW"
+        #                       0     1      2  3  4
+        parts = prompt.split(maxsplit=4)
+        if len(parts) != 5 or parts[3] != "to":
+            return "Usage: rename account <old> to <new>"
+
+        old_name, new_name = parts[2].lower(), parts[4].lower()
+
+        with get_session() as s:
+            acct = s.exec(
+                select(Account)
+                .where(Account.name == old_name, Account.user_id == user_uuid)
+            ).first()
+            if not acct:
+                return f"Account '{old_name}' not found."
+
+            exists = s.exec(
+                select(Account)
+                .where(Account.name == new_name, Account.user_id == user_uuid)
+            ).first()
+            if exists:
+                return f"Account name '{new_name}' already exists."
+
+            acct.name = new_name
+            s.commit()
+
+        return f"✏️  Account renamed to **{new_name}**."
 
     # ---- NLP fallback ----
     result = dispatch(prompt, ctx={"handle": handle, "user": current_user})

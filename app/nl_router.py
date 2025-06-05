@@ -146,6 +146,28 @@ def delete_lead_nl(ctx, email: str):
 def delete_account_nl(ctx, name: str):
     return ctx["handle"](f"delete account {name}", ctx["user"])
 
+@register(
+    "rename_account",
+    _schema(
+        "rename_account",
+        "Rename one of the user's accounts",
+        {"old": {"type": "string"}, "new": {"type": "string"}},
+    ),
+)
+def rename_account_nl(ctx, old: str, new: str):
+    return ctx["handle"](f"rename account {old} to {new}", ctx["user"])
+
+@register(
+    "rename_lead",
+    _schema(
+        "rename_lead",
+        "Rename a lead's e-mail address",
+        {"old": {"type": "string"}, "new": {"type": "string"}},
+    ),
+)
+def rename_lead_nl(ctx, old: str, new: str):
+    return ctx["handle"](f"rename lead {old} to {new}", ctx["user"])
+
 # ---------------------------------------------------------------------------
 
 def call_openai(prompt: str) -> Dict[str, Any] | None:
