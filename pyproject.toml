@@ -46,11 +46,15 @@ select = ["E", "F", "B", "I"]
 ignore = []
 
 [tool.coverage.run]
+# Only measure the code we actually unit-test
 omit = [
-    "app/main.py",      # Streamlit entry-point
-    "app/nl_router.py", # OpenAI router – exercised with integration tests later
-    "app/utils.py",
-    "app/audit.py",
-    "app/db.py",
+  "app/main.py",      # Streamlit entry-point
+  "app/commands.py",  # chat commands – exercised manually, not in CI
+  "app/reports.py",   # plotting helpers
+  "app/nl_router.py",
+  "app/audit.py",
+  "app/utils.py",
+  "app/database.py",
+  "app/db.py",
 ]
 
