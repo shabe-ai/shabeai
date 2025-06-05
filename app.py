@@ -12,6 +12,7 @@ from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi import Depends
 from app.auth import fastapi_users
+from app.reports import funnel_counts, win_rate
 import requests
 
 # auto-fetch current user if token already stored
@@ -95,6 +96,24 @@ def handle(prompt: str, current_user) -> str:
         return "Please log in first."
     prompt = prompt.lower().strip()
     user_id = current_user["id"]
+
+    # ---- reports ----
+    if prompt == "reports funnel":
+        with get_session() as s:
+            counts = funnel_counts(s, user_id)
+        if not counts:
+            return "No leads yet."
+        # ordered by pipeline flow
+        order = ["new", "qualified", "proposal", "won", "lost"]
+        stages = [st for st in order if st in counts]
+        vals = [counts[st] for st in stages]
+        fig = px.funnel(y=stages, x=vals, title="Lead Funnel")
+        return fig
+
+    if prompt == "reports winrate":
+        with get_session() as s:
+            rate, won, total = win_rate(s, user_id)
+        return f"🏆 Win-rate (last 30 d): **{rate:.1f}%**  ({won}/{total})"
 
     # ---- add account ----
     if prompt.startswith("add account"):
