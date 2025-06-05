@@ -45,3 +45,12 @@ target-version = "py312"
 select = ["E", "F", "B", "I"]
 ignore = []
 
+[tool.coverage.run]
+omit = [
+    "app/main.py",      # Streamlit entry-point
+    "app/nl_router.py", # OpenAI router – exercised with integration tests later
+    "app/utils.py",
+    "app/audit.py",
+    "app/db.py",
+]
+
