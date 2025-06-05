@@ -283,10 +283,9 @@ def handle(prompt: str, current_user) -> str:
             if to_uuid(acct.user_id) != user_uuid:
                 return "⛔ You don't own that account."
 
-            leads_cnt = (
-                s.exec(select(func.count()).where(Lead.account_id == acct.id))
-                 .one()[0]
-            )
+            leads_cnt = s.exec(
+                select(func.count()).where(Lead.account_id == acct.id)
+            ).one()            # ← scalar int
             if leads_cnt:
                 return f"⚠️ Account has {leads_cnt} lead(s). Delete them first."
 
