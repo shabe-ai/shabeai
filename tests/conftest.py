@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from app.auth import api as app
 from app.db import init_db, get_session, engine
 from sqlalchemy_utils import create_database, database_exists, drop_database
+import builtins
 
 @pytest.fixture(scope="session", autouse=True)
 def _fresh_db(tmp_path_factory):
@@ -23,4 +24,10 @@ def demo_user(client):
     client.post("/auth/register", json=data)
     login = client.post("/auth/jwt/login", data={"username": data["email"], "password": data["password"]})
     token = login.cookies.get("crm-auth")
-    return {"email": data["email"], "token": token} 
+    return {"email": data["email"], "token": token}
+
+@pytest.fixture(autouse=True)
+def _no_external_calls(monkeypatch):
+    """Prevent external API calls during tests."""
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    monkeypatch.setitem(builtins.__dict__, "openai", None)  # crude: prevents real import 
