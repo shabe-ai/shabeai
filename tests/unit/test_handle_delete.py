@@ -1,6 +1,6 @@
 from app.commands import handle
 from app.models import Account, Lead
-from app.database import get_session, init_db
+from app.database import get_session, init_db, engine
 from app.utils import to_uuid
 import uuid
 
@@ -17,7 +17,10 @@ def setup_account(session, name: str, user_id: str) -> Account:
 
 def test_delete_account_with_leads():
     """Test that we can't delete an account with attached leads."""
-    init_db()  # Ensure tables exist
+    # Ensure fresh database
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
+    
     user = str(uuid.uuid4())
     with get_session() as s:
         acc = setup_account(s, "globex", user)
@@ -30,7 +33,10 @@ def test_delete_account_with_leads():
 
 def test_delete_account_empty():
     """Test that we can delete an account with no leads."""
-    init_db()  # Ensure tables exist
+    # Ensure fresh database
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
+    
     user = str(uuid.uuid4())
     with get_session() as s:
         acc = setup_account(s, "empty", user)
