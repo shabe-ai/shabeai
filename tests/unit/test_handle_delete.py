@@ -1,6 +1,6 @@
 from app.commands import handle
 from app.models import Account, Lead
-from app.database import get_session
+from app.database import get_session, init_db
 import uuid
 
 def ctx():
@@ -16,6 +16,7 @@ def setup_account(session, name: str, user_id: uuid.UUID) -> Account:
 
 def test_delete_account_with_leads():
     """Test that we can't delete an account with attached leads."""
+    init_db()  # Ensure tables exist
     user = uuid.uuid4()
     with get_session() as s:
         acc = setup_account(s, "globex", user)
@@ -28,6 +29,7 @@ def test_delete_account_with_leads():
 
 def test_delete_account_empty():
     """Test that we can delete an account with no leads."""
+    init_db()  # Ensure tables exist
     user = uuid.uuid4()
     with get_session() as s:
         acc = setup_account(s, "empty", user)
