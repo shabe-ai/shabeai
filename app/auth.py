@@ -13,6 +13,9 @@ from app.db import get_session
 from pydantic import EmailStr
 import uuid
 import os
+from typing import Optional
+from fastapi import Request
+from fastapi_users import exceptions as fau_exc
 
 # User schemas
 class UserRead(schemas.BaseUser[uuid.UUID]):
@@ -63,6 +66,11 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
         """Parse the user ID from a string to UUID."""
         return uuid.UUID(value)
 
+    async def validate_password(self, password: str, user) -> None:
+        if len(password) < 6:
+            raise ValueError("Password must be ≥ 6 chars")
+        # no return needed – None means "OK"
+
 # Database dependency
 def get_user_db(session = Depends(get_session)):
     """
@@ -98,4 +106,8 @@ api.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
     tags=["users"],
-) 
+)
+
+current_active_user = fastapi_users.current_user(active=True)
+
+__all__ = ["router", "get_user_manager", "UserManager"] 
