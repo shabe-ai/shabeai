@@ -7,6 +7,7 @@ from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi_users_db_sqlmodel import SQLModelBaseUserDB, SQLModelUserDatabase
 from app.auth import auth_backend, fastapi_users
 from app.database import init_db
+from app.schemas import UserRead, UserCreate  # Import the schemas
 
 app = FastAPI(title="Chat CRM API")
 
@@ -30,7 +31,10 @@ app.include_router(
     tags=["auth"],
 )
 app.include_router(
-    fastapi_users.get_register_router(),
+    fastapi_users.get_register_router(
+        user_schema=UserRead,
+        user_create_schema=UserCreate,
+    ),
     prefix="/auth",
     tags=["auth"],
 )
