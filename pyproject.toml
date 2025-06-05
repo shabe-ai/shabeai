@@ -1,13 +1,10 @@
 [tool.poetry]
 name = "shabeai"
 version = "0.1.0"
-description = "Chat CRM"
-authors = [
-    { name = "Your Name", email = "your.email@example.com" },
-]
-packages = [
-    { include = "app" }
-]
+description = ""
+authors = ["Vigeash Gohbal <vigeash11@gmail.com>"]
+packages = [{ include = "app" }]
+package-mode = false
 
 [tool.poetry.dependencies]
 python = ">=3.12"
@@ -24,14 +21,14 @@ requests = ">=2.31.0"
 uvicorn = ">=0.27.1"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.4.0"
+pytest = "^8.2"
+ruff = "^0.4"
 pytest-cov = "^6.1.1"
 pytest-asyncio = "^1.0.0"
 httpx = "^0.28.1"
 pytest-mock = "^3.14.1"
 factory-boy = "^3.3.3"
 sqlalchemy-utils = "^0.41.2"
-ruff = "^0.4.0"
 
 [build-system]
 requires = ["poetry-core"]
