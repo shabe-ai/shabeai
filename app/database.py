@@ -16,12 +16,13 @@ engine = create_engine(
     connect_args={"check_same_thread": False} if TESTING else {},  # lets Starlette TestClient share it
 )
 
+def init_db() -> None:
+    """Create tables once (no-op if they already exist)."""
+    SQLModel.metadata.create_all(engine)
+
 @contextmanager
 def get_session():
-    """Yield a SQLModel Session as a proper context-manager."""
+    """Yield a Session; make sure tables exist (helps unit-tests)."""
+    init_db()                      # <-- NEW line
     with Session(engine) as session:
-        yield session
-
-def init_db() -> None:
-    """Initialize the database, creating all tables if they don't exist."""
-    SQLModel.metadata.create_all(engine) 
+        yield session 
