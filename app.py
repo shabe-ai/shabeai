@@ -471,6 +471,43 @@ else:
     headers = {"Cookie": f"crm-auth={st.session_state.access_token}"}
     # pass headers into every request / session wrapper
 
+# 🔎─--- Audit inspector -------------------------------------------------
+st.sidebar.header("🔎 Audit")
+
+# collect every email that has at least one audit record
+with get_session() as s:
+    audited_leads = (
+        s.exec(select(AuditLog.email).group_by(AuditLog.email).order_by(AuditLog.email))
+        .all()
+    )
+emails = [row[0] for row in audited_leads]
+
+if emails:
+    chosen_email = st.sidebar.selectbox("Pick a lead e-mail:", emails, key="audit_email")
+    if chosen_email:
+        # fetch logs for the chosen lead
+        with get_session() as s:
+            logs = (
+                s.exec(
+                    select(AuditLog)
+                    .where(AuditLog.email == chosen_email)
+                    .order_by(AuditLog.ts.desc())
+                )
+                .all()
+            )
+
+        # ↪ instantly render a bullet list (newest first)
+        if logs:
+            lines = [
+                f"- {log.ts:%Y-%m-%d %H:%M} | {log.action.replace('_', ' ')}"
+                for log in logs
+            ]
+            st.sidebar.markdown("\n".join(lines))
+        else:
+            st.sidebar.info("No audit events yet.")
+else:
+    st.sidebar.info("No audited leads found.")
+
 prompt = st.chat_input("Say something…")
 if prompt:
     user = st.session_state.get("current_user")
