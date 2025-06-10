@@ -1,0 +1,7 @@
+[theme]
+base = "light"
+primaryColor = "#F9C941"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F6F7"
+textColor = "#1E2429"
+font = "Figtree" 

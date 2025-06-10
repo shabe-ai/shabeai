@@ -7,7 +7,8 @@ from fastapi_users.authentication import JWTStrategy, AuthenticationBackend
 from fastapi_users_db_sqlmodel import SQLModelBaseUserDB, SQLModelUserDatabase
 from app.auth import auth_backend, fastapi_users
 from app.database import init_db
-from app.schemas import UserRead, UserCreate  # Import the schemas
+from app.schemas import UserRead, UserCreate, UserUpdate
+from app.chat_router import router as chat_router
 
 app = FastAPI(title="Chat CRM API")
 
@@ -15,10 +16,10 @@ app = FastAPI(title="Chat CRM API")
 async def startup_event():
     init_db()
 
-# Configure CORS
+# Add CORS middleware for local frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8501"],  # Streamlit frontend
+    allow_origins=["http://localhost:3000", "http://localhost:5173", "*"],  # Add your frontend URLs here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -39,10 +40,13 @@ app.include_router(
     tags=["auth"],
 )
 app.include_router(
-    fastapi_users.get_users_router(),
+    fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
     tags=["users"],
 )
+
+# Include chat router
+app.include_router(chat_router, prefix="/api", tags=["chat"])
 
 @app.get("/")
 async def root():

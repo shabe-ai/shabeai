@@ -10,4 +10,7 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 class UserCreate(schemas.BaseUserCreate):
     email: EmailStr
     password: str
+    full_name: str | None = None
+
+class UserUpdate(schemas.BaseUserUpdate):
     full_name: str | None = None 
