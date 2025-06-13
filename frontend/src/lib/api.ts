@@ -3,6 +3,8 @@
  * Do not make direct changes to the file.
  */
 
+import http from './http';
+
 export interface paths {
     "/auth/jwt/login": {
         parameters: {
@@ -584,4 +586,10 @@ export interface operations {
             };
         };
     };
+}
+
+export async function sendMessage(prompt: string): Promise<string> {
+  const { data } = await http.post('/chat', { message: prompt });
+  // Adjust if your backend returns a different shape
+  return data.reply ?? '⚠️ No response from server.';
 }

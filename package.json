@@ -16,9 +16,28 @@
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "js-cookie": "^3.0.5"
+    "js-cookie": "^3.0.5",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
   },
   "devDependencies": {
-    "@types/js-cookie": "^3.0.6"
+    "@tailwindcss/postcss": "^4.1.8",
+    "@types/js-cookie": "^3.0.6",
+    "@types/react-query": "^1.2.9",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.8"
+  },
+  "pnpm": {
+    "overrides": {
+      "@tanstack/react-query": "5.80.6",
+      "@tanstack/query-core": "5.80.6"
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@tailwindcss/oxide",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

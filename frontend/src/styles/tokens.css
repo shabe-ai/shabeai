@@ -1,0 +1,17 @@
+/* === BRAND TOKENS (imported in globals.css) === */
+:root {
+  --clr-lemon:   #FFF7C1;
+  --clr-sun:     #FFE875;
+  --clr-gold:    #F9C941;
+  --clr-fog:     #F5F6F7;
+  --clr-charcoal:#1E2429;
+  --glass-fill:  rgba(255,255,255,.06);
+  --glass-ring:  rgba(255,255,255,.10);
+  --glass-stroke:rgba(255,255,255,.08);
+
+  --ff-heading: "Bricolage Grotesque", sans-serif;
+  --ff-body:    "Figtree", sans-serif;
+
+  --radius-card: 1rem;
+  --radius-btn:  .5rem;
+} 
