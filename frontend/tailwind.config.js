@@ -8,11 +8,21 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        lemon:   'var(--clr-lemon)',
-        sun:     'var(--clr-sun)',
-        gold:    'var(--clr-gold)',
-        fog:     'var(--clr-fog)',
-        charcoal:'var(--clr-charcoal)',
+        lemon: {
+          DEFAULT: 'var(--clr-lemon)',
+        },
+        sun: {
+          DEFAULT: 'var(--clr-sun)',
+        },
+        gold: {
+          DEFAULT: 'var(--clr-gold)',
+        },
+        fog: {
+          DEFAULT: 'var(--clr-fog)',
+        },
+        charcoal: {
+          DEFAULT: 'var(--clr-charcoal)',
+        },
       },
       fontFamily: {
         heading: ['var(--ff-heading)'],
@@ -24,5 +34,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate')],
 }; 
