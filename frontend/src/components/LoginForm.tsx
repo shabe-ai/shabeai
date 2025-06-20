@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { login } from '@/lib/auth';      // your helper
 import { useState } from 'react';
 
-export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: string, pw: string) => Promise<any>, onSuccess?: () => void }) {
+export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: string, pw: string) => Promise<unknown>, onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
 

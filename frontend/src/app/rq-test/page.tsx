@@ -1,6 +1,6 @@
 'use client';
 
-import { QueryClient, QueryClientProvider, useMutation } from 'react-query';
+import { QueryClient, QueryClientProvider, useMutation } from '@tanstack/react-query';
 
 export default function RQTest() {
   const client = new QueryClient(); // new each render – OK for a test
