@@ -38,8 +38,7 @@
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "@tailwindcss/oxide",
-      "sharp",
-      "unrs-resolver"
+      "esbuild"
     ]
   }
 }

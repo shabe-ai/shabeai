@@ -5,9 +5,17 @@ import { ReactQueryStreamedHydration } from '@tanstack/react-query-next-experime
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ReactNode, useState } from 'react';
 
+interface User {
+  id: string;
+  email: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  is_verified: boolean;
+}
+
 interface ReactQueryProviderProps {
   children: ReactNode;
-  initialData?: any;
+  initialData?: User | null;
 }
 
 export default function ReactQueryProvider({ children, initialData }: ReactQueryProviderProps) {

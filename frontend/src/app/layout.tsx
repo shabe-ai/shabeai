@@ -1,11 +1,10 @@
 import './globals.css';
 import { Metadata } from 'next';
-import { Bricolage_Grotesque, Figtree } from 'next/font/google';
+import { Figtree } from 'next/font/google';
 import ReactQueryProvider from '@/components/ReactQueryProvider';
 import { cookies } from 'next/headers';
 
-const headingFont = Bricolage_Grotesque({ subsets:['latin'], weight:['700'] });
-const bodyFont    = Figtree({ subsets:['latin'], weight:['400'] });
+const bodyFont = Figtree({ subsets:['latin'], weight:['400'] });
 
 export const metadata: Metadata = { title: 'Shabe AI CRM' };
 

@@ -55,7 +55,7 @@
 
   /* === Generic bubble ============================================ */
   .message-content{
-    @apply rounded-[1.15rem] px-5 py-4 text-[0.95rem] leading-[1.45]
+    @apply rounded-[1.15rem] px-4 py-4 text-[0.95rem] leading-[1.45]
            whitespace-pre-wrap break-words w-fit
            max-w-[90vw] md:max-w-[70%];
   }
@@ -72,6 +72,19 @@
       inset 0 0 0 1px rgba(255,255,255,.55),
       inset 0 10px 18px rgba(0,0,0,.05),
       0 1px 2px rgba(0,0,0,.04);
+    padding-left: 1.25rem;   /* default */
+  }
+
+  .assistant-message .message-content:matches([class])::first-letter {
+    /* Add first-letter styling here if needed */
+  }
+
+  .assistant-message .message-content:where(:not(:has(ol,ul))) {
+    text-indent: 0;          /* reset for normal paragraphs */
+  }
+
+  .assistant-message .message-content:where(p:first-child)::after {
+    /* Placeholder for after first child paragraph */
   }
 
   /* user bubble */
@@ -105,6 +118,15 @@
   .send-button{
     @apply w-11 h-11 rounded-full grid place-items-center
            bg-gold hover:bg-sun transition-colors;
+    background: linear-gradient(
+        145deg,
+        #ffe66f 0%,          /* top-left highlight */
+        #ffd93b 45%,
+        #f8c900 100%         /* bottom-right shade */
+    );
+    box-shadow:
+      0 0 14px rgba(255,213,62,.45),     /* outer bloom */
+      inset 0 0 1px rgba(255,255,255,.35);/* subtle bevel */
   }
   .send-button svg{ @apply w-5 h-5; }
 }
@@ -116,6 +138,20 @@
 @layer utilities {
   .fade-in { @apply animate-[fadeIn_.25s_ease-out]; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  @keyframes dots {
+    0%   { content: ''; }
+    33%  { content: '·'; }
+    66%  { content: '··'; }
+    100% { content: '···'; }
+  }
+  .typing::after {
+    content: '';
+    animation: dots 1s steps(3,end) infinite;
+  }
+  .typing-dots {
+    @apply inline-block whitespace-nowrap leading-none align-middle;
+  }
 }
 
 /* ---- Optional: Empty-state gradient --------------------------------- */

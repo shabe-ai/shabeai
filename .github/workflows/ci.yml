@@ -37,7 +37,6 @@ jobs:
         run: |
           cd frontend
           pnpm build
-      - name: Run frontend tests
+      - name: Run vitest unit tests
         run: |
-          cd frontend
-          pnpm test:e2e 
+          pnpm --filter frontend test --run 

@@ -7,12 +7,18 @@ const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
 export async function login(email: string, password: string) {
   const body = new URLSearchParams({ username: email, password }).toString();
-  await fetch(`${API}/auth/jwt/login`, {
+  const response = await fetch(`${API}/auth/jwt/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
     credentials: 'include',            // let browser keep crm-auth cookie
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: 'Login failed' }));
+    throw new Error(errorData.detail || 'Login failed');
+  }
+  
   // cookie arrives as Set-Cookie; js-cookie is only needed for reading later
   return Cookies.get('crm-auth');
 }
@@ -26,12 +32,17 @@ export const queryClient = new QueryClient();
 // API functions for the hook
 const loginApi = async (email: string, pw: string) => {
   const body = new URLSearchParams({ username: email, password: pw }).toString();
-  await fetch(`${API}/auth/jwt/login`, {
+  const response = await fetch(`${API}/auth/jwt/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body,
     credentials: 'include',
   });
+  
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ detail: 'Login failed' }));
+    throw new Error(errorData.detail || 'Login failed');
+  }
 };
 
 const logoutApi = async () => {
