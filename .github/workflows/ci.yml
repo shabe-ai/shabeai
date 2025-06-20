@@ -39,4 +39,4 @@ jobs:
           pnpm build
       - name: Run vitest unit tests
         run: |
-          pnpm --filter frontend test --run 
+          pnpm --filter frontend test:ci 

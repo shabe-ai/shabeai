@@ -12,6 +12,7 @@
     "cypress:run": "cypress run",
     "test:e2e": "cypress run",
     "test": "vitest",
+    "test:ci": "vitest --run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch"
   },
