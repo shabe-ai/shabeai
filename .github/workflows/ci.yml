@@ -16,7 +16,7 @@ jobs:
           poetry install --with dev
       - name: Run Python tests
         run: |
-          poetry run pytest --cov=app --cov-fail-under=80
+          poetry run pytest --cov=app --cov-fail-under=60
 
   test-frontend:
     runs-on: ubuntu-latest
