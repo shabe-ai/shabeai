@@ -11,7 +11,7 @@
     "lint": "pnpm --filter frontend lint"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-query": "5.80.6",
     "@tanstack/react-query-devtools": "^5.80.6",
     "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
@@ -21,6 +21,7 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/postcss": "^4.1.8",
     "@types/js-cookie": "^3.0.6",
     "@types/react-query": "^1.2.9",
@@ -31,13 +32,13 @@
   "pnpm": {
     "overrides": {
       "@tanstack/react-query": "5.80.6",
-      "@tanstack/query-core": "5.80.6"
+      "@tanstack/query-core": "5.80.6",
+      "tailwindcss-merge": "npm:tailwind-merge@^2.3.0"
     },
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "@tailwindcss/oxide",
-      "sharp",
-      "unrs-resolver"
+      "esbuild"
     ]
   }
 }

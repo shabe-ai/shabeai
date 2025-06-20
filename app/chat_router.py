@@ -36,7 +36,12 @@ async def chat(req: ChatRequest):
             temperature=0.7,
             max_tokens=512,
         )
-        return {"reply": completion.choices[0].message.content}
+        content = completion.choices[0].message.content
+        # Sanitize: if all lines are identical, return only one
+        lines = [line.strip() for line in content.strip().split("\n") if line.strip()]
+        if lines and all(line == lines[0] for line in lines):
+            content = lines[0]
+        return {"reply": content}
     except OpenAIError as e:
         # Surface model errors cleanly to your front-end
         raise HTTPException(status_code=502, detail=str(e))

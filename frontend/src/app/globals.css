@@ -10,92 +10,148 @@
 @tailwind utilities;
 
 @layer base {
-  html,body { @apply h-full w-full text-charcoal font-body bg-white; }
+  html,body{
+    @apply h-full w-full overflow-hidden        /* ⬅ stop outer scrolling  */
+              text-charcoal font-body bg-white;
+  }
   ::selection { @apply bg-gold bg-opacity-70 text-charcoal; }
 }
 
-/* ---- Chat Layout ----------------------------------------------------- */
+/* ------------------------------------------------------------------ */
+/*  COMPONENTS – glossy glass card + soft bubbles (final polish)      */
+/* ------------------------------------------------------------------ */
 @layer components {
-  /* Chat canvas */
-  #chat-root {
-    @apply flex flex-col min-h-[100dvh] max-w-[768px] mx-auto px-4;
+
+  /* === Frosted card ============================================= */
+  #chat-frame{
+    @apply mx-auto my-4 max-w-[720px] flex flex-col
+           h-[calc(100dvh-2rem)] rounded-[2rem] overflow-hidden;
+
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(22px) saturate(140%);
+    box-shadow:
+      0 8px 24px rgba(0,0,0,.12),        /* deep drop */
+      inset 0 1px 0 rgba(255,255,255,.35);/* glass edge */
   }
 
-  /* header trim */
-  header {
-    @apply flex items-center gap-1 font-heading text-lg border-b;
-    padding-block: .75rem;
-    border-bottom: 1px solid rgba(0,0,0,.05);
-  }
-  header img { @apply w-24 h-24; }
-  header .title { @apply font-light; }
-
-  /* message stream */
-  .message-list {
-    @apply flex flex-col flex-1 overflow-y-auto px-6 pt-10 gap-3;
+  /* subtle centre highlight / vignette */
+  #chat-frame::before{
+    content:'';
+    position:absolute; inset:0; z-index:-1;
+    background:radial-gradient(ellipse at 50% -25%,
+                rgba(255,255,255,.40) 0%,transparent 65%);
   }
 
-  /* =====  common bubble style  ===== */
-  .message-content {
-    @apply rounded-[1.125rem] px-4 py-3 leading-[1.45] text-[0.95rem];
-    max-width: 90vw;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06);
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    word-break: normal;
+  /* === Header ==================================================== */
+  header{ @apply flex items-center gap-2 px-6 py-6 border-b border-white/15; }
+  header img { @apply w-[72px] h-[72px]; }
+  header .title{ @apply font-medium text-lg tracking-wide; }
+
+  /* === Message list ============================================== */
+  .message-list{
+    @apply flex flex-col flex-1 min-h-0 overflow-y-auto
+           overscroll-contain px-6 pt-10 gap-3;
   }
 
-  /* =====  user-side wrapper  ===== */
-  .user-message {
-    @apply flex justify-end w-full;
+  /* === Generic bubble ============================================ */
+  .message-content{
+    @apply rounded-[1.15rem] px-4 py-4 text-[0.95rem] leading-[1.45]
+           whitespace-pre-wrap break-words w-fit
+           max-w-[90vw] md:max-w-[70%];
   }
 
-  .user-message .message-content {
-    @apply bg-lemon text-charcoal;
-    margin-left: auto;
-    display: inline-block;
-    width: fit-content;
+  /* assistant bubble */
+  .assistant-message .message-content{
+    background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.80) 0%,
+        rgba(255,255,255,.65) 60%,
+        rgba(245,247,250,.55) 100%
+    );
+    box-shadow:
+      inset 0 0 0 1px rgba(255,255,255,.55),
+      inset 0 10px 18px rgba(0,0,0,.05),
+      0 1px 2px rgba(0,0,0,.04);
+    padding-left: 1.25rem;   /* default */
   }
 
-  @media (min-width: 768px) {
-    .user-message .message-content { max-width: 60%; }
+  .assistant-message .message-content:matches([class])::first-letter {
+    /* Add first-letter styling here if needed */
   }
 
-  .assistant-message {
-    /* alignment handled by parent flex container */
-  }
-  .assistant-message .message-content {
-    @apply bg-fog text-charcoal;
-    box-shadow: 0 1px 2px rgba(0,0,0,.06);
-    animation: slideInL .18s ease-out;
+  .assistant-message .message-content:where(:not(:has(ol,ul))) {
+    text-indent: 0;          /* reset for normal paragraphs */
   }
 
-  /* input bar */
-  .chat-input-wrap {
-    @apply sticky bottom-0 left-0 right-0 py-3 px-4 bg-white/75 backdrop-blur-[6px] border-t border-fog flex gap-2;
-    box-shadow: 0 -2px 4px rgba(0,0,0,.03);
+  .assistant-message .message-content:where(p:first-child)::after {
+    /* Placeholder for after first child paragraph */
   }
-  .chat-input {
-    @apply flex-1 border border-fog rounded-[1.75rem] px-4 py-[0.65rem] outline-none;
+
+  /* user bubble */
+  .user-message{ @apply flex justify-end w-full pr-1; }
+  .user-message .message-content{
+    @apply bg-gold text-charcoal;
+    background: linear-gradient(
+        145deg,
+        #ffe66f 0%,          /* top-left highlight */
+        #ffd93b 45%,
+        #f8c900 100%         /* bottom-right shade */
+    );
+    box-shadow:
+      0 0 14px rgba(255,213,62,.45),     /* outer bloom */
+      inset 0 0 1px rgba(255,255,255,.35);/* subtle bevel */
   }
-  .send-button {
-    @apply w-10 h-10 rounded-full bg-gold flex items-center justify-center transition-colors hover:bg-sun;
+
+  /* === Input footer ============================================== */
+  .chat-input-wrap{
+    @apply sticky bottom-0 left-0 w-full flex gap-2 px-6 py-4
+           backdrop-blur-md border-t border-white/20;
+
+    /* translucent grey-blue strip */
+    background:rgba(240,242,246,0.72);
   }
-  .send-button svg {
-    @apply w-[1.1rem];
-    transform: rotate(45deg);
+  .chat-input{
+    @apply flex-1 bg-white rounded-full px-5 py-3 border-none
+           placeholder:text-charcoal placeholder:opacity-40
+           focus:outline-none;
   }
+  .send-button{
+    @apply w-11 h-11 rounded-full grid place-items-center
+           bg-gold hover:bg-sun transition-colors;
+    background: linear-gradient(
+        145deg,
+        #ffe66f 0%,          /* top-left highlight */
+        #ffd93b 45%,
+        #f8c900 100%         /* bottom-right shade */
+    );
+    box-shadow:
+      0 0 14px rgba(255,213,62,.45),     /* outer bloom */
+      inset 0 0 1px rgba(255,255,255,.35);/* subtle bevel */
+  }
+  .send-button svg{ @apply w-5 h-5; }
 }
+
+/* slide-in keyframes (unchanged) */
+@keyframes slideInL { from{opacity:0;transform:translateX(-8px)} to{opacity:1} }
 
 /* ---- Tiny util for fade-in ------------------------------------------ */
 @layer utilities {
   .fade-in { @apply animate-[fadeIn_.25s_ease-out]; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
-}
 
-@keyframes slideInL {
-  from { opacity:0; transform:translateX(-8px); }
-  to   { opacity:1; transform:none; }
+  @keyframes dots {
+    0%   { content: ''; }
+    33%  { content: '·'; }
+    66%  { content: '··'; }
+    100% { content: '···'; }
+  }
+  .typing::after {
+    content: '';
+    animation: dots 1s steps(3,end) infinite;
+  }
+  .typing-dots {
+    @apply inline-block whitespace-nowrap leading-none align-middle;
+  }
 }
 
 /* ---- Optional: Empty-state gradient --------------------------------- */
@@ -104,4 +160,21 @@ body:has(.message-list:empty)::before {
   position: fixed; inset: 0;
   background: radial-gradient(at 50% 20%, var(--clr-sun) 0%, transparent 60%);
   opacity: .12; pointer-events: none;
+}
+
+/* ───────── Input – placeholder colour fix ───────── */
+.chat-input::placeholder{           /* same shade you asked for earlier  */
+  color: var(--clr-charcoal);
+  opacity:.40;
+}
+
+/* ---- Page backdrop ------------------------------------------- */
+body::before{
+  content:'';
+  position:fixed; inset:0; z-index:-1;
+  background:
+    radial-gradient(at 50% 0%, rgba(255,255,255,.35) 0%, transparent 40%),
+    radial-gradient(at 90% 90%, rgba(255,255,255,.15) 0%, transparent 60%),
+    #dfe4ea;           /* fallback */
+  background-attachment:fixed;
 }
