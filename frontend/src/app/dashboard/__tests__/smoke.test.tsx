@@ -3,7 +3,6 @@ import DashboardHome from '@/app/(secure)/dashboard/page';
 import SecureLayout from '@/app/(secure)/layout';
 import DashboardLayout from '@/app/(secure)/dashboard/layout';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode } from 'react';
 import { vi } from 'vitest';
 
 vi.mock('next/navigation', () => ({
