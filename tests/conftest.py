@@ -1,7 +1,7 @@
 import pytest, uuid, os
 from fastapi.testclient import TestClient
 from app.auth import api as app
-from app.db import init_db, get_session, engine
+from app.database import get_session
 from sqlalchemy_utils import create_database, database_exists, drop_database
 import builtins
 

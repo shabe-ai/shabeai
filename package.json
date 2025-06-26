@@ -3,12 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
     "dev": "pnpm --filter frontend dev",
     "build": "pnpm --filter frontend build",
-    "lint": "pnpm --filter frontend lint"
+    "lint": "pnpm --filter frontend lint",
+    "test": "pnpm --filter shabeai-backend test",
+    "generate-openapi": "pnpm --filter shabeai-backend openapi-json && pnpm --filter frontend update-api"
   },
   "dependencies": {
     "@tanstack/react-query": "5.80.6",

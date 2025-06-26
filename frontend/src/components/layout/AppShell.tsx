@@ -17,6 +17,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {p.charAt(0).toUpperCase() + p.slice(1)}
         </Link>
       ))}
+      <Link href="/secure/leads"
+            className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-muted">
+        Leads
+      </Link>
     </nav>
   );
 

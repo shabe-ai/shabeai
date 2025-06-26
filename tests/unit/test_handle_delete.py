@@ -23,10 +23,10 @@ def test_delete_account_with_leads():
     SQLModel.metadata.create_all(engine)
     
     user = str(uuid.uuid4())
-    with get_session() as s:
-        acc = setup_account(s, "globex", user)
-        s.add(Lead(email="x@globex.com", account_id=acc.id, user_id=to_uuid(user)))
-        s.commit()
+    s = next(get_session())
+    acc = setup_account(s, "globex", user)
+    s.add(Lead(email="x@globex.com", account_id=acc.id, user_id=to_uuid(user)))
+    s.commit()
     
     # Should refuse to delete account with leads
     res = handle("delete account globex", {"id": user})
@@ -39,8 +39,8 @@ def test_delete_account_empty():
     SQLModel.metadata.create_all(engine)
     
     user = str(uuid.uuid4())
-    with get_session() as s:
-        acc = setup_account(s, "empty", user)
+    s = next(get_session())
+    acc = setup_account(s, "empty", user)
     
     # Should allow deletion of empty account
     res = handle("delete account empty", {"id": user})

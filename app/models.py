@@ -16,7 +16,7 @@ class Stage(str, enum.Enum):
     WON = "won"
     LOST = "lost"
 
-class User(SQLModel, table=True):
+class User(SQLModelBaseUserDB, table=True):
     __tablename__ = "user"
     __table_args__ = (UniqueConstraint("email"),)
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)

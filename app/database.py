@@ -1,6 +1,5 @@
 import os, sys
 from sqlmodel import SQLModel, create_engine, Session
-from contextlib import contextmanager
 
 TESTING = "pytest" in sys.modules              # <─ detects pytest
 DATABASE_URL = (
@@ -20,9 +19,8 @@ def init_db() -> None:
     """Create tables once (no-op if they already exist)."""
     SQLModel.metadata.create_all(engine)
 
-@contextmanager
 def get_session():
-    """Yield a Session; make sure tables exist (helps unit-tests)."""
-    init_db()                      # <-- NEW line
+    """Yield a Session; make sure tables exist."""
+    init_db()
     with Session(engine) as session:
         yield session 

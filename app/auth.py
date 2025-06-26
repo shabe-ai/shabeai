@@ -9,7 +9,7 @@ from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from fastapi_users.manager import BaseUserManager
 from fastapi_users.exceptions import UserAlreadyExists
 from app.models import User
-from app.db import get_session
+from app.database import get_session
 from pydantic import EmailStr
 import uuid
 import os

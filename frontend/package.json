@@ -14,7 +14,9 @@
     "test": "vitest",
     "test:ci": "vitest --run",
     "test:ui": "vitest --ui",
-    "test:watch": "vitest --watch"
+    "test:watch": "vitest --watch",
+    "generate-api": "openapi-typescript-codegen --input openapi.json --output src/api/generated",
+    "update-api": "copy ..\\backend\\openapi.json ."
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.14",
@@ -51,6 +53,7 @@
     "eslint-config-next": "15.3.3",
     "jsdom": "^26.1.0",
     "msw": "^2.10.2",
+    "openapi-typescript-codegen": "^0.27.0",
     "postcss": "^8.5.5",
     "react": "19",
     "tailwindcss": "^3.4.17",

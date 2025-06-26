@@ -1,22 +1,33 @@
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000',
-  withCredentials: true, // ← include crm-auth cookie
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
-// Global error interceptor for 401/403 responses
+// Add request interceptor for authentication
+api.interceptors.request.use((config) => {
+  // TODO: Add authentication token when implemented
+  // const token = getAuthToken();
+  // if (token) {
+  //   config.headers.Authorization = `Bearer ${token}`;
+  // }
+  return config;
+});
+
+// Add response interceptor for error handling
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Clear auth cookie
-      document.cookie = 'crm-auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // Handle common errors (401, 403, 500, etc.)
+    if (error.response?.status === 401) {
       // Redirect to login
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   }
