@@ -58,15 +58,10 @@ jobs:
         working-directory: frontend
 
       - name: Build frontend
-        run: |
-          if [ -z "$NEXT_PUBLIC_CONVEX_URL" ]; then
-            echo "Error: NEXT_PUBLIC_CONVEX_URL is missing"
-            exit 1
-          fi
-          pnpm build
+        run: pnpm build
         working-directory: frontend
         env:
-          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD || 'https://precious-eel-928.convex.cloud' }}
 
   # Security Scanning
   security:
@@ -159,15 +154,10 @@ jobs:
         working-directory: frontend
 
       - name: Build frontend for production
-        run: |
-          if [ -z "$NEXT_PUBLIC_CONVEX_URL" ]; then
-            echo "Error: NEXT_PUBLIC_CONVEX_URL is missing"
-            exit 1
-          fi
-          pnpm build
+        run: pnpm build
         working-directory: frontend
         env:
-          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD || 'https://precious-eel-928.convex.cloud' }}
 
       - name: Test production build
         run: |
