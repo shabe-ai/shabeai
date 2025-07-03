@@ -11,6 +11,18 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useCurrentUser', () => ({
+  useCurrentUser: () => ({
+    data: {
+      id: 'test-user',
+      email: 'test@example.com',
+      full_name: 'Test User',
+    },
+    error: null,
+    isLoading: false,
+  }),
+}));
+
 const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
     queries: {
@@ -41,5 +53,5 @@ test('navbar appears for authenticated user', async () => {
       </DashboardLayout>
     </SecureLayout>
   );
-  expect(await screen.findByRole('link', { name: /pipeline/i })).toBeInTheDocument();
+  expect(await screen.findByRole('link', { name: /Pipeline/i })).toBeInTheDocument();
 }); 

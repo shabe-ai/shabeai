@@ -10,6 +10,13 @@ export const handlers = [
       full_name: 'Test User',
     });
   }),
+  http.get('http://localhost:8000/users/me', () => {
+    return HttpResponse.json({
+      id: 'test-user',
+      email: 'test@example.com',
+      full_name: 'Test User',
+    });
+  }),
 ];
 
 export const server = setupServer(...handlers); 
