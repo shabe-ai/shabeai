@@ -1,14 +1,15 @@
-import pytest
-from unittest.mock import Mock, patch
 from datetime import datetime, timedelta
+
+from app.models import Lead, Task
 from app.services.task_service import TaskService
-from app.models import Task, Lead
 
 
 def test_task_service_list_tasks(session):
     """Test listing tasks through the service"""
     # Create a lead first
-    lead = Lead(firstName="Test", lastName="Lead", email="testlead_list@example.com")
+    lead = Lead(
+        firstName="Test", lastName="Lead", email="testlead_list@example.com"
+    )
     session.add(lead)
     session.commit()
     session.refresh(lead)
@@ -16,8 +17,12 @@ def test_task_service_list_tasks(session):
     # Create some tasks
     due_date = datetime.now() + timedelta(days=7)
     tasks = [
-        Task(title="Task 1", dueDate=due_date, isDone=False, leadId=lead.id),
-        Task(title="Task 2", dueDate=due_date, isDone=True, leadId=lead.id)
+        Task(
+            title="Task 1", dueDate=due_date, isDone=False, leadId=lead.id
+        ),
+        Task(
+            title="Task 2", dueDate=due_date, isDone=True, leadId=lead.id
+        ),
     ]
     for task in tasks:
         session.add(task)
@@ -34,14 +39,18 @@ def test_task_service_list_tasks(session):
 def test_task_service_get_task(session):
     """Test getting a task by ID through the service"""
     # Create a lead first
-    lead = Lead(firstName="Test", lastName="Lead 2", email="testlead_get@example.com")
+    lead = Lead(
+        firstName="Test", lastName="Lead 2", email="testlead_get@example.com"
+    )
     session.add(lead)
     session.commit()
     session.refresh(lead)
     
     # Create a task
     due_date = datetime.now() + timedelta(days=5)
-    task = Task(title="Test Task", dueDate=due_date, isDone=False, leadId=lead.id)
+    task = Task(
+        title="Test Task", dueDate=due_date, isDone=False, leadId=lead.id
+    )
     session.add(task)
     session.commit()
     session.refresh(task)
@@ -62,7 +71,9 @@ def test_task_service_get_task_not_found(session):
 def test_task_service_create_task(session):
     """Test creating a task through the service"""
     # Create a lead first
-    lead = Lead(firstName="Test", lastName="Lead 3", email="testlead_create@example.com")
+    lead = Lead(
+        firstName="Test", lastName="Lead 3", email="testlead_create@example.com"
+    )
     session.add(lead)
     session.commit()
     session.refresh(lead)
@@ -73,7 +84,7 @@ def test_task_service_create_task(session):
         "title": "New Task",
         "dueDate": due_date,
         "isDone": False,
-        "leadId": lead.id
+        "leadId": lead.id,
     }
     
     task = service.create(task_data)
@@ -86,21 +97,29 @@ def test_task_service_create_task(session):
 def test_task_service_update_task(session):
     """Test updating a task through the service"""
     # Create a lead first
-    lead = Lead(firstName="Test", lastName="Lead 4", email="testlead_update@example.com")
+    lead = Lead(
+        firstName="Test", lastName="Lead 4", email="testlead_update@example.com"
+    )
     session.add(lead)
     session.commit()
     session.refresh(lead)
     
     # Create a task
     due_date = datetime.now() + timedelta(days=3)
-    task = Task(title="Original Task", dueDate=due_date, isDone=False, leadId=lead.id)
+    task = Task(
+        title="Original Task", dueDate=due_date, isDone=False, leadId=lead.id
+    )
     session.add(task)
     session.commit()
     session.refresh(task)
     
     service = TaskService(session)
     new_due_date = datetime.now() + timedelta(days=15)
-    update_data = {"title": "Updated Task", "dueDate": new_due_date, "isDone": True}
+    update_data = {
+        "title": "Updated Task",
+        "dueDate": new_due_date,
+        "isDone": True,
+    }
     
     updated_task = service.update(task, update_data)
     assert updated_task.title == "Updated Task"
@@ -110,14 +129,18 @@ def test_task_service_update_task(session):
 def test_task_service_delete_task(session):
     """Test deleting a task through the service"""
     # Create a lead first
-    lead = Lead(firstName="Test", lastName="Lead 5", email="testlead_delete@example.com")
+    lead = Lead(
+        firstName="Test", lastName="Lead 5", email="testlead_delete@example.com"
+    )
     session.add(lead)
     session.commit()
     session.refresh(lead)
     
     # Create a task
     due_date = datetime.now() + timedelta(days=1)
-    task = Task(title="Delete Me", dueDate=due_date, isDone=False, leadId=lead.id)
+    task = Task(
+        title="Delete Me", dueDate=due_date, isDone=False, leadId=lead.id
+    )
     session.add(task)
     session.commit()
     session.refresh(task)

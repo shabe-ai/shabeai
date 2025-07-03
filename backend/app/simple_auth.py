@@ -55,7 +55,9 @@ def get_current_user(credentials=Depends(security), db=Depends(get_session)):
 def create_demo_user(db: Session):
     """Create the demo user if it doesn't exist."""
     # Check if demo user already exists
-    existing_user = db.exec(select(User).where(User.email == "demo@example.com")).first()
+    existing_user = db.exec(
+        select(User).where(User.email == "demo@example.com")
+    ).first()
     if existing_user:
         return existing_user
     

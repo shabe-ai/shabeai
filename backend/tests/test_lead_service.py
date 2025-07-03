@@ -1,8 +1,6 @@
-import pytest
-from unittest.mock import Mock, patch
-from app.services.lead_service import LeadService
 from app.models import Lead
 from app.schemas.lead import LeadCreate
+from app.services.lead_service import LeadService
 
 
 def test_lead_service_list_leads(session):
@@ -55,11 +53,11 @@ def test_lead_service_create_lead(session):
     )
     
     # Convert to dict since the service expects model_dump()
-    lead_dict = {
-        "firstName": lead_data.firstName,
-        "lastName": lead_data.lastName,
-        "email": lead_data.email
-    }
+    # lead_dict = {
+    #     "firstName": lead_data.firstName,
+    #     "lastName": lead_data.lastName,
+    #     "email": lead_data.email
+    # }
     
     lead = service.create(lead_data)
     assert lead.firstName == "Jane"
@@ -77,7 +75,9 @@ def test_lead_service_update_lead(session):
     
     service = LeadService(session)
     from app.schemas.lead import LeadCreate
-    update_data = LeadCreate(firstName="Updated", lastName="Name", email="updated1@example.com")
+    update_data = LeadCreate(
+        firstName="Updated", lastName="Name", email="updated1@example.com"
+    )
     
     updated_lead = service.update(lead, update_data)
     assert updated_lead.firstName == "Updated"

@@ -1,5 +1,5 @@
-import pytest
 from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
@@ -17,7 +17,12 @@ def test_create_deal():
     company_resp = client.post("/companies/", json=company_data)
     assert company_resp.status_code == 201
     company_id = company_resp.json()["id"]
-    data = {"title": "Coverage Deal", "value": 12345, "stage": "new", "companyId": company_id}
+    data = {
+        "title": "Coverage Deal",
+        "value": 12345,
+        "stage": "new",
+        "companyId": company_id,
+    }
     response = client.post("/deals/", json=data)
     assert response.status_code == 201
     deal = response.json()

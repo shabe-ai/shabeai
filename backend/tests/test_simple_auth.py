@@ -1,10 +1,13 @@
-import pytest
-from unittest.mock import Mock, patch
-from fastapi import HTTPException
-from app.simple_auth import get_current_user, verify_password, get_password_hash, create_access_token, create_demo_user
-from app.models import User
-from datetime import datetime, timedelta
+from unittest.mock import patch
+
 import jwt
+
+from app.simple_auth import (
+    create_access_token,
+    create_demo_user,
+    get_password_hash,
+    verify_password,
+)
 
 
 def test_verify_password():

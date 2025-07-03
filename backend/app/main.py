@@ -10,7 +10,7 @@ from app.database import init_db
 from app.logging_config import setup_logging
 from app.middleware.request_id import RequestIDMiddleware
 from app.models import User
-from app.routers import auth, lead, meta, company, deal, task
+from app.routers import auth, company, deal, lead, meta, task
 
 # Setup structured logging
 setup_logging()

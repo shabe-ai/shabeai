@@ -1,6 +1,8 @@
-import pytest
 from unittest.mock import Mock, patch
-from app.deps import get_db, get_current_active_user
+
+import pytest
+
+from app.deps import get_current_active_user, get_db
 
 
 def test_get_db():
@@ -14,7 +16,9 @@ def test_get_db():
         pass
 
 
-@pytest.mark.skip(reason="Mocking FastAPI Depends chain is brittle; skip for coverage run.")
+@pytest.mark.skip(
+    reason="Mocking FastAPI Depends chain is brittle; skip for coverage run."
+)
 @patch('app.deps.get_current_user')
 def test_get_current_active_user(mock_get_current_user):
     """Test get_current_active_user dependency"""

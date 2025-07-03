@@ -1,7 +1,5 @@
-import pytest
-from unittest.mock import Mock, patch
-from app.services.company_service import CompanyService
 from app.models import Company
+from app.services.company_service import CompanyService
 
 
 def test_company_service_list_companies(session):
