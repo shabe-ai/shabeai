@@ -1,5 +1,2 @@
-[tool.ruff]
-per-file-ignores = { "backend/app/routers/*.py" = ["B008"] }
-
 [tool.ruff.lint]
 per-file-ignores = { "backend/app/routers/*.py" = ["B008"] } 
