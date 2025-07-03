@@ -12,10 +12,8 @@ from fastapi_users.authentication import (
 from fastapi_users.manager import BaseUserManager
 from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from pydantic import EmailStr
-from sqlmodel import Session
 
 from .deps import get_db
-
 from .models import User
 
 
@@ -87,12 +85,12 @@ class UserManager(BaseUserManager[User, UUID]):
 
 
 # Database dependency
-def get_user_db(session=Depends(get_db)):
+def get_user_db(session=Depends(get_db)):  # noqa: B008
     yield SQLModelUserDatabase(session, User)
 
 
 # User manager dependency
-async def get_user_manager(user_db=Depends(get_user_db)):
+async def get_user_manager(user_db=Depends(get_user_db)):  # noqa: B008
     yield UserManager(user_db)
 
 

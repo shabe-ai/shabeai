@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
 
-from app.auth import auth_backend, get_user_manager, UserRead, UserCreate, UserUpdate
+from app.auth import UserCreate, UserRead, UserUpdate, auth_backend, get_user_manager
 from app.chat_router import router as chat_router
 from app.database import init_db
 from app.logging_config import setup_logging
