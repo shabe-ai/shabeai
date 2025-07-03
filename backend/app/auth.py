@@ -1,5 +1,5 @@
 import os
-import uuid
+from uuid import UUID
 
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users import exceptions as fau_exc
@@ -17,8 +17,8 @@ from .models import User
 
 
 # User schemas
-class UserRead(schemas.BaseUser[uuid.UUID]):
-    id: uuid.UUID
+class UserRead(schemas.BaseUser[UUID]):
+    id: UUID
     email: EmailStr
     full_name: str | None
 
@@ -59,7 +59,7 @@ auth_backend = AuthenticationBackend(
 )
 
 
-class UserManager(BaseUserManager[User, uuid.UUID]):
+class UserManager(BaseUserManager[User, UUID]):
     reset_password_token_secret = SECRET
     verification_token_secret = SECRET
 
@@ -79,9 +79,8 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(self, user: User, token: str, request=None):
         print(f"User {user.email} forgot password. Token: {token}")
 
-    def parse_id(self, value: str) -> uuid.UUID:
-        """Convert id string to UUID (required by BaseUserManager)."""
-        return uuid.UUID(value)
+    async def parse_id(self, value: str | UUID) -> UUID:  # type: ignore[override]
+        return UUID(str(value))
 
 
 # Database dependency
@@ -95,7 +94,7 @@ async def get_user_manager(user_db: SQLModelUserDatabase):
 
 
 # FastAPI Users instance
-fastapi_users = FastAPIUsers[User, uuid.UUID](
+fastapi_users = FastAPIUsers[User, UUID](
     get_user_manager,  # <- must be a callable dependency
     [auth_backend],
 )

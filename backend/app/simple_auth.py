@@ -36,11 +36,7 @@ def get_password_hash(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
-def get_current_user(credentials=None, db=None):
-    if credentials is None:
-        credentials = Depends(security)
-    if db is None:
-        db = Depends(get_session)
+def get_current_user(credentials=Depends(security), db=Depends(get_session)):
     try:
         payload = jwt.decode(
             credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM]

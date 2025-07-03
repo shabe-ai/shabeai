@@ -9,4 +9,4 @@ def get_db():
 
 def get_current_active_user():
     """Get current active user dependency"""
-    return get_current_user
+    yield get_current_user

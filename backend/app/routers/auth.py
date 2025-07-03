@@ -31,9 +31,7 @@ class Token(BaseModel):
 
 
 @router.post("/login", response_model=Token)
-def login(user_credentials: UserLogin, db=None):
-    if db is None:
-        db = Depends(get_session)
+def login(user_credentials: UserLogin, db=Depends(get_session)) -> Token:
     user = db.exec(select(User).where(User.email == user_credentials.email)).first()
     if not user or not verify_password(user_credentials.password, user.hashed_password):
         raise HTTPException(
@@ -43,13 +41,11 @@ def login(user_credentials: UserLogin, db=None):
         )
 
     access_token = create_access_token(data={"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
 
 
 @router.post("/register", response_model=Token)
-def register(user_data: UserRegister, db=None):
-    if db is None:
-        db = Depends(get_session)
+def register(user_data: UserRegister, db=Depends(get_session)) -> Token:
     # Check if user already exists
     existing_user = db.exec(select(User).where(User.email == user_data.email)).first()
     if existing_user:
@@ -71,20 +67,16 @@ def register(user_data: UserRegister, db=None):
     db.refresh(user)
 
     access_token = create_access_token(data={"sub": user.id})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
 
 
 @router.post("/setup-demo")
-def setup_demo(db=None):
-    if db is None:
-        db = Depends(get_session)
+def setup_demo(db=Depends(get_session)) -> dict[str, str]:
     """Setup demo user for testing."""
     create_demo_user(db)
     return {"message": "Demo user setup complete"}
 
 
 @router.get("/users", response_model=list[User])
-def list_users(db=None):
-    if db is None:
-        db = Depends(get_session)
+def list_users(db=Depends(get_session)) -> list[User]:
     return db.query(User).all()
