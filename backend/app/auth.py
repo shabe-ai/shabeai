@@ -1,5 +1,6 @@
 import os
 import uuid
+from uuid import UUID
 
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users import exceptions as fau_exc
@@ -79,9 +80,12 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(self, user: User, token: str, request=None):
         print(f"User {user.email} forgot password. Token: {token}")
 
-    def parse_id(self, value: str) -> str:
-        """Parse the user ID from a string to string (for SQLite compatibility)."""
-        return str(value)
+    async def parse_id(self, value: str | UUID) -> UUID:
+        """
+        FastAPI-Users helper: ensure the returned identifier is **UUID**,
+        satisfying the BaseUserManager contract.
+        """
+        return value if isinstance(value, UUID) else UUID(value)
 
 
 # Database dependency
