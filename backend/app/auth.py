@@ -80,12 +80,9 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
     async def on_after_forgot_password(self, user: User, token: str, request=None):
         print(f"User {user.email} forgot password. Token: {token}")
 
-    async def parse_id(self, value: str | UUID) -> UUID:
-        """
-        FastAPI-Users helper: ensure the returned identifier is **UUID**,
-        satisfying the BaseUserManager contract.
-        """
-        return value if isinstance(value, UUID) else UUID(value)
+    def parse_id(self, value: str) -> uuid.UUID:
+        """Convert id string to UUID (required by BaseUserManager)."""
+        return uuid.UUID(value)
 
 
 # Database dependency
