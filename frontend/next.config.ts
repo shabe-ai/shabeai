@@ -1,5 +1,9 @@
 import type { NextConfig } from "next";
 
+if (!process.env.NEXT_PUBLIC_CONVEX_URL) {
+  throw new Error('NEXT_PUBLIC_CONVEX_URL is missing');
+}
+
 const nextConfig: NextConfig = {
   async rewrites() {
     return [

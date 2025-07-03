@@ -60,6 +60,8 @@ jobs:
       - name: Build frontend
         run: pnpm build
         working-directory: frontend
+        env:
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
 
   # Security Scanning
   security:
@@ -154,6 +156,8 @@ jobs:
       - name: Build frontend for production
         run: pnpm build
         working-directory: frontend
+        env:
+          NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
 
       - name: Test production build
         run: |

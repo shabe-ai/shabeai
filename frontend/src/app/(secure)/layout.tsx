@@ -1,5 +1,10 @@
 import ProtectedRoute from '@/components/ProtectedRoute';
+import Providers from '../(providers)/react-query';
 
 export default function SecureLayout({ children }: { children: React.ReactNode }) {
-  return <ProtectedRoute>{children}</ProtectedRoute>;
+  return (
+    <Providers>
+      <ProtectedRoute>{children}</ProtectedRoute>
+    </Providers>
+  );
 } 
