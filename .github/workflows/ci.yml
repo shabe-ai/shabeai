@@ -55,27 +55,24 @@ jobs:
           pip install poetry
 
       - name: Install dependencies
-        run: |
-          cd backend
-          poetry install --with dev
+        run: poetry install --with dev
+        working-directory: backend
 
       - name: Run linting
         run: |
-          cd backend
           poetry run ruff check .
           poetry run ruff format --check .
+        working-directory: backend
 
       - name: Run type checking
-        run: |
-          cd backend
-          poetry run mypy app/ --ignore-missing-imports
+        run: poetry run mypy app/ --ignore-missing-imports
+        working-directory: backend
 
       - name: Run tests with coverage
         env:
           DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
-        run: |
-          cd backend
-          poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=html --cov-fail-under=80
+        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=html --cov-fail-under=80
+        working-directory: backend
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
@@ -166,9 +163,8 @@ jobs:
         run: pip install bandit
 
       - name: Run Bandit scan
-        run: |
-          cd backend
-          bandit -r app/ -f json -o bandit-report.json || true
+        run: bandit -r app/ -f json -o bandit-report.json || true
+        working-directory: backend
 
   # Docker Build Test
   docker-build:
@@ -183,9 +179,9 @@ jobs:
 
       - name: Build and test backend image
         run: |
-          cd backend
           docker build -t shabeai-backend:test .
           docker run --rm shabeai-backend:test python -c "import app.main; print('Backend import successful')"
+        working-directory: backend
 
       - name: Build and test frontend image
         run: |
@@ -227,16 +223,14 @@ jobs:
           pip install poetry
 
       - name: Install dependencies
-        run: |
-          cd backend
-          poetry install --with dev
+        run: poetry install --with dev
+        working-directory: backend
 
       - name: Run integration tests
         env:
           DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
-        run: |
-          cd backend
-          poetry run pytest tests/integration/ -v
+        run: poetry run pytest tests/integration/ -v
+        working-directory: backend
 
   # Performance Tests (Optional)
   performance:
@@ -258,11 +252,9 @@ jobs:
           pip install poetry
 
       - name: Install dependencies
-        run: |
-          cd backend
-          poetry install --with dev
+        run: poetry install --with dev
+        working-directory: backend
 
       - name: Run performance tests
-        run: |
-          cd backend
-          poetry run pytest tests/performance/ -v --benchmark-only || echo "No performance tests found" 
+        run: poetry run pytest tests/performance/ -v --benchmark-only || echo "No performance tests found"
+        working-directory: backend 
