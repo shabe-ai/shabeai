@@ -9,9 +9,7 @@ router = APIRouter(prefix="/leads", tags=["leads"])
 
 
 @router.get("/", response_model=list[LeadOut])
-def list_leads(request: Request, db=None):
-    if db is None:
-        db = Depends(get_session)
+def list_leads(request: Request, db=Depends(get_session)):
     log = structlog.get_logger().bind(
         component="leads-api", request_id=request.state.request_id
     )
@@ -22,9 +20,7 @@ def list_leads(request: Request, db=None):
 
 
 @router.post("/", response_model=LeadOut, status_code=201)
-def create_lead(lead: LeadCreate, request: Request, db=None):
-    if db is None:
-        db = Depends(get_session)
+def create_lead(lead: LeadCreate, request: Request, db=Depends(get_session)):
     log = structlog.get_logger().bind(
         component="leads-api", request_id=request.state.request_id
     )
