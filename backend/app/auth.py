@@ -1,7 +1,6 @@
 import os
 import uuid
 
-from fastapi import Depends
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users import exceptions as fau_exc
 from fastapi_users.authentication import (
@@ -14,7 +13,6 @@ from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from pydantic import EmailStr
 from sqlmodel import Session
 
-from .database import get_session
 from .models import User
 
 

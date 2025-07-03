@@ -1,5 +1,6 @@
 import structlog
 from fastapi import APIRouter, Depends, Request
+from sqlalchemy.orm import Session
 
 from ..database import get_session
 from ..schemas.lead import LeadCreate, LeadOut
@@ -9,7 +10,7 @@ router = APIRouter(prefix="/leads", tags=["leads"])
 
 
 @router.get("/", response_model=list[LeadOut])
-def list_leads(request: Request, db=Depends(get_session)):
+def list_leads(request: Request, db: Session = Depends(get_session)):  # noqa: B008
     log = structlog.get_logger().bind(
         component="leads-api", request_id=request.state.request_id
     )
@@ -20,7 +21,7 @@ def list_leads(request: Request, db=Depends(get_session)):
 
 
 @router.post("/", response_model=LeadOut, status_code=201)
-def create_lead(lead: LeadCreate, request: Request, db=Depends(get_session)):
+def create_lead(lead: LeadCreate, request: Request, db: Session = Depends(get_session)):  # noqa: B008
     log = structlog.get_logger().bind(
         component="leads-api", request_id=request.state.request_id
     )

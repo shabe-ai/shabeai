@@ -1,6 +1,4 @@
 import pytest
-import uuid
-import os
 from typing import Generator
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
@@ -9,11 +7,6 @@ from faker import Faker
 
 from app.main import app
 from app.database import get_session
-from app.models import User, Company, Lead, Deal, Task
-from .factories import (
-    LeadFactory, CompanyFactory, DealFactory, TaskFactory,
-    valid_lead_payload, valid_company_payload, valid_deal_payload, valid_task_payload
-)
 
 # Initialize Faker for test data generation
 fake = Faker()

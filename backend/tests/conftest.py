@@ -1,11 +1,12 @@
 import uuid
 
 import pytest
-from app.main import app
-from app.database import get_session, init_db, engine
-from app.models import Company, Lead
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel
+
+from app.database import engine, get_session
+from app.main import app
+from app.models import Company, Lead
 
 
 @pytest.fixture(scope="session", autouse=True)
