@@ -1,8 +1,8 @@
 import uuid
 
 import pytest
-from app.database import engine
-from app.main import app, get_session
+from app.main import app
+from app.database import get_session, init_db, engine
 from app.models import Company, Lead
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel
@@ -27,6 +27,7 @@ def _override_session():
         yield s
 
 
+# Override the dependency
 app.dependency_overrides[get_session] = _override_session
 
 
