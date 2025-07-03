@@ -32,10 +32,11 @@ def test_login_and_me(client):
 def test_leads_list(client, session):
     # seed one lead (using your SQLModel ORM)
     from app.models import Lead
+
     lead = Lead(firstName="John", lastName="Doe", email="john@acme.dev")
     session.add(lead)
     session.commit()
 
     r = client.get("/leads/")
     assert r.status_code == 200
-    assert len(r.json()) >= 1 
+    assert len(r.json()) >= 1

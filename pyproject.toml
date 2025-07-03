@@ -35,6 +35,8 @@ httpx = "^0.28.1"
 pytest-mock = "^3.14.1"
 factory-boy = "^3.3.3"
 sqlalchemy-utils = "^0.41.2"
+mypy = "^1.10.0"
+bandit = "^1.7.8"
 
 [build-system]
 requires = ["poetry-core"]
@@ -48,6 +50,8 @@ addopts = "--cov=app --cov-report=term-missing"
 [tool.ruff]
 line-length = 88
 target-version = "py312"
+
+[tool.ruff.lint]
 select = ["E", "F", "B", "I"]
 ignore = []
 
@@ -63,4 +67,30 @@ omit = [
   "app/database.py",
   "app/db.py",
 ]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "fastapi_users.*",
+    "fastapi_users_db_sqlmodel.*",
+    "sqlmodel.*",
+    "structlog.*",
+    "bcrypt.*",
+    "pyjwt.*"
+]
+ignore_missing_imports = true
 

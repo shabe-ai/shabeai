@@ -1,12 +1,11 @@
 import uuid
 
 import pytest
-from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel
-
 from app.database import engine
 from app.main import app, get_session
 from app.models import Company, Lead
+from fastapi.testclient import TestClient
+from sqlmodel import Session, SQLModel
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -16,20 +15,25 @@ def db_engine():
     yield engine
     SQLModel.metadata.drop_all(engine)
 
+
 @pytest.fixture()
 def session():
     with Session(engine) as s:
-        yield s        # empty session per-test → no state bleed
+        yield s  # empty session per-test → no state bleed
+
 
 def _override_session():
     with Session(engine) as s:
         yield s
 
+
 app.dependency_overrides[get_session] = _override_session
+
 
 @pytest.fixture()
 def client():
     return TestClient(app)
+
 
 @pytest.fixture()
 def auth_headers(client):
@@ -53,18 +57,20 @@ def auth_headers(client):
     cookie = resp.cookies.get("crm-auth")
     return {"Cookie": f"crm-auth={cookie}"} if cookie else {}
 
+
 @pytest.fixture()
 def sample_company(session):
     company = Company(
         id=str(uuid.uuid4()),
         name="Test Company",
         website="https://testcompany.com",
-        linkedinUrl="https://linkedin.com/company/test"
+        linkedinUrl="https://linkedin.com/company/test",
     )
     session.add(company)
     session.commit()
     session.refresh(company)
     return company
+
 
 @pytest.fixture()
 def sample_lead(session, sample_company):
@@ -79,4 +85,4 @@ def sample_lead(session, sample_company):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    return lead 
+    return lead

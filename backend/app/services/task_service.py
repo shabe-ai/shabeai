@@ -30,4 +30,4 @@ class TaskService:
 
     def delete(self, db_task):
         self.session.delete(db_task)
-        self.session.commit() 
+        self.session.commit()

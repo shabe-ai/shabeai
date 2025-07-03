@@ -13,15 +13,17 @@ setup_logging()
 
 app = FastAPI(title="Chat CRM API")
 
+
 @app.on_event("startup")
 async def startup_event():
     init_db()
+
 
 # Add Request ID middleware first (before everything else)
 app.add_middleware(RequestIDMiddleware)
 
 # Add CORS middleware for local frontend
-origins = ["http://localhost:3001"]   # Next dev URL
+origins = ["http://localhost:3001"]  # Next dev URL
 
 app.add_middleware(
     CORSMiddleware,
@@ -63,6 +65,7 @@ app.include_router(chat_router, prefix="/api", tags=["chat"])
 # Include meta router for health and version endpoints
 app.include_router(meta.router)
 
+
 @app.get("/")
 async def root():
-    return {"message": "Chat CRM API is running"} 
+    return {"message": "Chat CRM API is running"}

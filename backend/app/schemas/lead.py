@@ -8,11 +8,13 @@ class LeadBase(BaseModel):
     phone: str | None = None
     companyId: str | None = None
 
+
 class LeadCreate(LeadBase):
     pass
+
 
 class LeadOut(LeadBase):
     id: str
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

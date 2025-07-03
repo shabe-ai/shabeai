@@ -20,6 +20,7 @@ class User(SQLModel, table=True):
     is_verified: bool = Field(default=False)
     full_name: str | None = None
 
+
 class Company(SQLModel, table=True):
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
@@ -29,10 +30,11 @@ class Company(SQLModel, table=True):
     website: Optional[str] = None
     linkedinUrl: Optional[str] = None
     createdAt: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
     leads: List["Lead"] = Relationship(back_populates="company")
     deals: List["Deal"] = Relationship(back_populates="company")
+
 
 class Lead(SQLModel, table=True):
     id: str = Field(
@@ -46,10 +48,11 @@ class Lead(SQLModel, table=True):
     linkedinUrl: Optional[str] = None
     companyId: Optional[str] = Field(default=None, foreign_key="company.id")
     createdAt: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
     company: Optional[Company] = Relationship(back_populates="leads")
     tasks: List["Task"] = Relationship(back_populates="lead")
+
 
 class Deal(SQLModel, table=True):
     id: str = Field(
@@ -61,9 +64,10 @@ class Deal(SQLModel, table=True):
     stage: str = Field(default="new")
     companyId: str = Field(foreign_key="company.id")
     createdAt: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
     company: Company = Relationship(back_populates="deals")
+
 
 class Task(SQLModel, table=True):
     id: str = Field(
@@ -75,6 +79,6 @@ class Task(SQLModel, table=True):
     isDone: bool = Field(default=False)
     leadId: Optional[str] = Field(default=None, foreign_key="lead.id")
     createdAt: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # Relationships
-    lead: Optional[Lead] = Relationship(back_populates="tasks") 
+    lead: Optional[Lead] = Relationship(back_populates="tasks")

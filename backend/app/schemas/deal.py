@@ -7,11 +7,13 @@ class DealBase(BaseModel):
     stage: str = "new"
     companyId: str
 
+
 class DealCreate(DealBase):
     pass
+
 
 class DealOut(DealBase):
     id: str
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

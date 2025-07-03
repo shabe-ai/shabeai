@@ -9,11 +9,13 @@ class TaskBase(BaseModel):
     isDone: bool = False
     leadId: str | None = None
 
+
 class TaskCreate(TaskBase):
     pass
+
 
 class TaskOut(TaskBase):
     id: str
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

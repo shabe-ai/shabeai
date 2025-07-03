@@ -15,6 +15,7 @@
     "test:ci": "vitest --run",
     "test:ui": "vitest --ui",
     "test:watch": "vitest --watch",
+    "type-check": "tsc --noEmit",
     "generate-api": "openapi-typescript-codegen --input openapi.json --output src/api/generated",
     "update-api": "copy ..\\backend\\openapi.json ."
   },

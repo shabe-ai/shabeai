@@ -30,4 +30,4 @@ class LeadService:
 
     def delete(self, db_lead):
         self.session.delete(db_lead)
-        self.session.commit() 
+        self.session.commit()

@@ -6,11 +6,13 @@ class CompanyBase(BaseModel):
     website: str | None = None
     linkedinUrl: str | None = None
 
+
 class CompanyCreate(CompanyBase):
     pass
+
 
 class CompanyOut(CompanyBase):
     id: str
 
     class Config:
-        from_attributes = True 
+        from_attributes = True

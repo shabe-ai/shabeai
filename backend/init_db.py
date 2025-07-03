@@ -10,5 +10,6 @@ def main():
     print("Database initialized successfully!")
     print("All tables created with String(36) UUID columns.")
 
+
 if __name__ == "__main__":
-    main() 
+    main()

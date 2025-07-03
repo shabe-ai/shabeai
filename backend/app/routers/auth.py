@@ -13,18 +13,22 @@ from ..simple_auth import (
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
+
 class UserLogin(BaseModel):
     email: str
     password: str
+
 
 class UserRegister(BaseModel):
     email: str
     password: str
     full_name: str | None = None
 
+
 class Token(BaseModel):
     access_token: str
     token_type: str
+
 
 @router.post("/login", response_model=Token)
 def login(user_credentials: UserLogin, db=None):
@@ -37,9 +41,10 @@ def login(user_credentials: UserLogin, db=None):
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     access_token = create_access_token(data={"sub": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.post("/register", response_model=Token)
 def register(user_data: UserRegister, db=None):
@@ -49,10 +54,9 @@ def register(user_data: UserRegister, db=None):
     existing_user = db.exec(select(User).where(User.email == user_data.email)).first()
     if existing_user:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email already registered"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered"
         )
-    
+
     # Create new user
     hashed_password = get_password_hash(user_data.password)
     user = User(
@@ -60,14 +64,15 @@ def register(user_data: UserRegister, db=None):
         hashed_password=hashed_password,
         full_name=user_data.full_name,
         is_active=True,
-        is_verified=True
+        is_verified=True,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
-    
+
     access_token = create_access_token(data={"sub": user.id})
     return {"access_token": access_token, "token_type": "bearer"}
+
 
 @router.post("/setup-demo")
 def setup_demo(db=None):
@@ -75,4 +80,11 @@ def setup_demo(db=None):
         db = Depends(get_session)
     """Setup demo user for testing."""
     create_demo_user(db)
-    return {"message": "Demo user setup complete"} 
+    return {"message": "Demo user setup complete"}
+
+
+@router.get("/users", response_model=list[User])
+def list_users(db=None):
+    if db is None:
+        db = Depends(get_session)
+    return db.query(User).all()

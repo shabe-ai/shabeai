@@ -30,4 +30,4 @@ class CompanyService:
 
     def delete(self, db_company):
         self.session.delete(db_company)
-        self.session.commit() 
+        self.session.commit()
