@@ -9,6 +9,7 @@ export default defineSchema({
     isSuperuser: v.boolean(),
     isVerified: v.boolean(),
     createdAt: v.number(),
+    passwordHash: v.optional(v.string()),
   }).index("by_email", ["email"]),
 
   companies: defineTable({

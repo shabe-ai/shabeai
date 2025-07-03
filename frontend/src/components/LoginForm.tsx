@@ -1,27 +1,45 @@
 'use client';
 
-import { useMutation } from '@tanstack/react-query';
-import { login } from '@/lib/auth';      // your helper
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: string, pw: string) => Promise<unknown>, onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const m = useMutation({
-    mutationFn: () => (onSubmit ? onSubmit(email, pw) : login(email, pw)),
-    onSuccess: () => {
-      if (onSuccess) return onSuccess();
-      window.location.replace('/dashboard');
-    },
-  });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      if (onSubmit) {
+        await onSubmit(email, pw);
+      } else {
+        // Simple demo login - in production you'd use Convex auth
+        if (email === 'demo@example.com' && pw === 'password') {
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            router.push('/dashboard');
+          }
+        } else {
+          throw new Error('Invalid credentials');
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        m.mutate();
-      }}
+      onSubmit={handleSubmit}
       className="flex flex-col gap-4 max-w-sm mx-auto mt-16"
     >
       <input
@@ -42,16 +60,19 @@ export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: 
       />
       <button
         type="submit"
-        disabled={m.isPending}
+        disabled={isLoading}
         className="btn btn-primary"
       >
-        {m.isPending ? 'Signing in…' : 'Sign in'}
+        {isLoading ? 'Signing in…' : 'Sign in'}
       </button>
-      {m.isError && (
+      {error && (
         <p className="text-red-600 text-sm mt-2">
-          {(m.error as Error).message}
+          {error}
         </p>
       )}
+      <p className="text-sm text-gray-600 text-center mt-4">
+        Demo: demo@example.com / password
+      </p>
     </form>
   );
 } 
