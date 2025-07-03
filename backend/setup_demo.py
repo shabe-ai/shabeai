@@ -1,5 +1,6 @@
+
 import requests
-import json
+
 
 def setup_demo_user():
     """Setup the demo user."""

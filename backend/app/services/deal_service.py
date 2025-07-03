@@ -1,5 +1,7 @@
 from sqlmodel import Session, select
+
 from ..models import Deal
+
 
 class DealService:
     def __init__(self, session: Session):

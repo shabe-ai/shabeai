@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class CompanyBase(BaseModel):
     name: str
     website: str | None = None

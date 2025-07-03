@@ -1,21 +1,21 @@
-from fastapi import FastAPI, Depends
+import os
+import uuid
+
+from fastapi import Depends
 from fastapi_users import FastAPIUsers, schemas
+from fastapi_users import exceptions as fau_exc
 from fastapi_users.authentication import (
-    CookieTransport,
     AuthenticationBackend,
+    CookieTransport,
     JWTStrategy,
 )
-from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from fastapi_users.manager import BaseUserManager
-from fastapi_users.exceptions import UserAlreadyExists
-from .models import User
-from .database import get_session
+from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from pydantic import EmailStr
-import uuid
-import os
-from typing import Optional
-from fastapi import Request
-from fastapi_users import exceptions as fau_exc
+
+from .database import get_session
+from .models import User
+
 
 # User schemas
 class UserRead(schemas.BaseUser[uuid.UUID]):
@@ -38,7 +38,9 @@ LIFETIME_SECONDS = 60 * 60 * 24  # one day
 # Cookie transport
 cookie_transport = CookieTransport(
     cookie_name="crm-auth",
-    cookie_max_age=LIFETIME_SECONDS,
+    cookie_max_age=LIFETIME_SECONDS,   # 1 day
+    cookie_secure=False,              # dev only
+    cookie_samesite="lax",           # dev only
 )
 
 # JWT strategy
@@ -65,25 +67,28 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
 
     async def on_after_register(self, user: User, request=None):
         print(f"User {user.email} has registered.")
+        # Auto-verify the user
+        user.is_verified = True
+        print(f"User {user.email} has been auto-verified.")
 
     async def on_after_forgot_password(self, user: User, token: str, request=None):
         print(f"User {user.email} forgot password. Token: {token}")
 
-    def parse_id(self, value: str) -> uuid.UUID:
-        """Parse the user ID from a string to UUID."""
-        return uuid.UUID(value)
+    def parse_id(self, value: str) -> str:
+        """Parse the user ID from a string to string (for SQLite compatibility)."""
+        return str(value)
 
 # Database dependency
-def get_user_db(session = Depends(get_session)):
-    """
-    FastAPI dependency that provides a UserDatabase
-    instance bound to the current SQLModel session.
-    """
+def get_user_db(session=None):
+    if session is None:
+        session = Depends(get_session)
     yield SQLModelUserDatabase(session, User)
 
 # User manager dependency
-async def get_user_manager(session=Depends(get_session)):
-    user_db = SQLModelUserDatabase(session, User)   # DB layer
+async def get_user_manager(session=None):
+    if session is None:
+        session = Depends(get_session)
+    user_db = SQLModelUserDatabase(session, User)
     yield UserManager(user_db)
 
 # FastAPI Users instance

@@ -1,16 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException
-from sqlmodel import Session
+from fastapi import APIRouter, Depends
+
 from ..database import get_session
-from ..services.company_service import CompanyService
-from ..schemas.company import CompanyCreate, CompanyOut
 from ..deps import get_current_active_user
+from ..schemas.company import CompanyCreate, CompanyOut
+from ..services.company_service import CompanyService
 
 router = APIRouter(prefix="/companies", tags=["companies"])
 
 @router.get("/", response_model=list[CompanyOut])
-def list_companies(db: Session = Depends(get_session), _=Depends(get_current_active_user)):
+def list_companies(db=None, _=None):
+    if db is None:
+        db = Depends(get_session)
+    if _ is None:
+        _ = Depends(get_current_active_user)
     return CompanyService(db).list()
 
 @router.post("/", response_model=CompanyOut, status_code=201)
-def create_company(company: CompanyCreate, db: Session = Depends(get_session), _=Depends(get_current_active_user)):
+def create_company(company: CompanyCreate, db=None, _=None):
+    if db is None:
+        db = Depends(get_session)
+    if _ is None:
+        _ = Depends(get_current_active_user)
     return CompanyService(db).create(company) 

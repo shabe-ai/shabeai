@@ -1,5 +1,7 @@
 from sqlmodel import Session, select
+
 from ..models import Lead
+
 
 class LeadService:
     def __init__(self, session: Session):

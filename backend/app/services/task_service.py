@@ -1,5 +1,7 @@
 from sqlmodel import Session, select
+
 from ..models import Task
+
 
 class TaskService:
     def __init__(self, session: Session):

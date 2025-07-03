@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 
+
 class DealBase(BaseModel):
     title: str
     value: int

@@ -1,9 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
-from ..database import get_session
-from ..simple_auth import create_access_token, verify_password, get_password_hash, create_demo_user
-from ..models import User
 from pydantic import BaseModel
+from sqlmodel import select
+
+from ..database import get_session
+from ..models import User
+from ..simple_auth import (
+    create_access_token,
+    create_demo_user,
+    get_password_hash,
+    verify_password,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -21,7 +27,9 @@ class Token(BaseModel):
     token_type: str
 
 @router.post("/login", response_model=Token)
-def login(user_credentials: UserLogin, db: Session = Depends(get_session)):
+def login(user_credentials: UserLogin, db=None):
+    if db is None:
+        db = Depends(get_session)
     user = db.exec(select(User).where(User.email == user_credentials.email)).first()
     if not user or not verify_password(user_credentials.password, user.hashed_password):
         raise HTTPException(
@@ -34,7 +42,9 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_session)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/register", response_model=Token)
-def register(user_data: UserRegister, db: Session = Depends(get_session)):
+def register(user_data: UserRegister, db=None):
+    if db is None:
+        db = Depends(get_session)
     # Check if user already exists
     existing_user = db.exec(select(User).where(User.email == user_data.email)).first()
     if existing_user:
@@ -60,7 +70,9 @@ def register(user_data: UserRegister, db: Session = Depends(get_session)):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.post("/setup-demo")
-def setup_demo(db: Session = Depends(get_session)):
+def setup_demo(db=None):
+    if db is None:
+        db = Depends(get_session)
     """Setup demo user for testing."""
     create_demo_user(db)
     return {"message": "Demo user setup complete"} 

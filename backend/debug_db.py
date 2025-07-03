@@ -1,7 +1,8 @@
-from app.database import get_session
-from app.simple_auth import create_demo_user
-from app.models import User
 from sqlmodel import select
+
+from app.database import get_session
+from app.models import User
+from app.simple_auth import create_demo_user
 
 print("Testing database connection...")
 

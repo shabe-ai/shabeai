@@ -1,5 +1,6 @@
+
 import requests
-import time
+
 
 def test_server():
     """Test if the server is responding."""

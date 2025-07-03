@@ -1,45 +1,62 @@
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlalchemy.pool import StaticPool
-from app.main import app
-from app.deps import get_db
-from app.models import Lead, Company, Deal, Task
+from sqlmodel import Session, SQLModel
 
-# Create in-memory SQLite database for testing
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
+from app.database import engine
+from app.main import app, get_session
+from app.models import Company, Lead
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
 
-@pytest.fixture(name="session")
-def session_fixture():
+@pytest.fixture(scope="session", autouse=True)
+def db_engine():
+    # create fresh schema once for the session
     SQLModel.metadata.create_all(engine)
-    with Session(engine) as session:
-        yield session
+    yield engine
     SQLModel.metadata.drop_all(engine)
 
-@pytest.fixture(name="client")
-def client_fixture(session: Session):
-    def get_db_override():
-        yield session
-    
-    app.dependency_overrides[get_db] = get_db_override
-    with TestClient(app) as client:
-        yield client
-    app.dependency_overrides.clear()
+@pytest.fixture()
+def session():
+    with Session(engine) as s:
+        yield s        # empty session per-test → no state bleed
 
-@pytest.fixture(name="auth_headers")
-def auth_headers_fixture():
-    # Mock authentication headers - replace with actual auth logic
-    return {"Authorization": "Bearer test-token"}
+def _override_session():
+    with Session(engine) as s:
+        yield s
 
-@pytest.fixture(name="sample_company")
-def sample_company_fixture(session: Session):
+app.dependency_overrides[get_session] = _override_session
+
+@pytest.fixture()
+def client():
+    return TestClient(app)
+
+@pytest.fixture()
+def auth_headers(client):
+    # Register user (ignore if already exists)
+    client.post(
+        "/auth/register",
+        json={
+            "email": "test@example.com",
+            "password": "testpassword",
+            "full_name": "Test User",
+        },
+    )
+    # Login user
+    resp = client.post(
+        "/auth/jwt/login",
+        data={"username": "test@example.com", "password": "testpassword"},
+        headers={"Content-Type": "application/x-www-form-urlencoded"},
+    )
+    assert resp.status_code == 204
+    # Return cookie for authenticated requests
+    cookie = resp.cookies.get("crm-auth")
+    return {"Cookie": f"crm-auth={cookie}"} if cookie else {}
+
+@pytest.fixture()
+def sample_company(session):
     company = Company(
+        id=str(uuid.uuid4()),
         name="Test Company",
         website="https://testcompany.com",
         linkedinUrl="https://linkedin.com/company/test"
@@ -49,14 +66,15 @@ def sample_company_fixture(session: Session):
     session.refresh(company)
     return company
 
-@pytest.fixture(name="sample_lead")
-def sample_lead_fixture(session: Session, sample_company):
+@pytest.fixture()
+def sample_lead(session, sample_company):
     lead = Lead(
-        email="test@example.com",
+        id=str(uuid.uuid4()),
         firstName="John",
         lastName="Doe",
+        email="test@example.com",
         phone="+1234567890",
-        companyId=sample_company.id
+        companyId=sample_company.id,
     )
     session.add(lead)
     session.commit()

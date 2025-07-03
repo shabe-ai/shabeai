@@ -1,5 +1,7 @@
 from sqlmodel import Session, select
+
 from ..models import Company
+
 
 class CompanyService:
     def __init__(self, session: Session):

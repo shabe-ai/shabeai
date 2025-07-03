@@ -9,8 +9,6 @@ from app.auth import auth_backend, fastapi_users
 from app.database import init_db
 from app.schemas import UserRead, UserCreate, UserUpdate
 from app.chat_router import router as chat_router
-from app.routers import lead
-from app.routers import auth
 
 app = FastAPI(title="Chat CRM API")
 
@@ -47,11 +45,7 @@ app.include_router(
     tags=["users"],
 )
 
-# Include custom auth router
-app.include_router(auth.router, prefix="/custom-auth", tags=["custom-auth"])
 
-# Include leads router
-app.include_router(lead.router)
 
 # Include chat router
 app.include_router(chat_router, prefix="/api", tags=["chat"])
