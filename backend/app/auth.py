@@ -87,12 +87,12 @@ class UserManager(BaseUserManager[User, uuid.UUID]):
 
 
 # Database dependency
-def get_user_db(session: Session = Depends(get_session)):
+def get_user_db(session: Session):
     yield SQLModelUserDatabase(session, User)
 
 
 # User manager dependency
-async def get_user_manager(user_db: SQLModelUserDatabase = Depends(get_user_db)):
+async def get_user_manager(user_db: SQLModelUserDatabase):
     yield UserManager(user_db)
 
 
