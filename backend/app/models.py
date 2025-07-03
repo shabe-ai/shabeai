@@ -6,7 +6,7 @@ from sqlalchemy import Column, String
 from sqlmodel import Field, Relationship, SQLModel, UniqueConstraint
 
 
-class User(SQLModel, table=True):
+class User(SQLModel, table=True):  # type: ignore[call-arg,misc]
     __tablename__ = "user"
     __table_args__ = (UniqueConstraint("email"),)
     id: str = Field(
@@ -21,7 +21,7 @@ class User(SQLModel, table=True):
     full_name: str | None = None
 
 
-class Company(SQLModel, table=True):
+class Company(SQLModel, table=True):  # type: ignore[call-arg,misc]
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
         sa_column=Column(String(36), primary_key=True),
@@ -36,7 +36,7 @@ class Company(SQLModel, table=True):
     deals: List["Deal"] = Relationship(back_populates="company")
 
 
-class Lead(SQLModel, table=True):
+class Lead(SQLModel, table=True):  # type: ignore[call-arg,misc]
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
         sa_column=Column(String(36), primary_key=True),
@@ -54,7 +54,7 @@ class Lead(SQLModel, table=True):
     tasks: List["Task"] = Relationship(back_populates="lead")
 
 
-class Deal(SQLModel, table=True):
+class Deal(SQLModel, table=True):  # type: ignore[call-arg,misc]
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
         sa_column=Column(String(36), primary_key=True),
@@ -69,7 +69,7 @@ class Deal(SQLModel, table=True):
     company: Company = Relationship(back_populates="deals")
 
 
-class Task(SQLModel, table=True):
+class Task(SQLModel, table=True):  # type: ignore[call-arg,misc]
     id: str = Field(
         default_factory=lambda: str(uuid.uuid4()),
         sa_column=Column(String(36), primary_key=True),
