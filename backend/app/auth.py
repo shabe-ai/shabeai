@@ -1,6 +1,5 @@
 import os
 import uuid
-from uuid import UUID
 
 from fastapi_users import FastAPIUsers, schemas
 from fastapi_users import exceptions as fau_exc
