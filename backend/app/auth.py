@@ -1,6 +1,7 @@
 import os
 from uuid import UUID
 
+from fastapi import Depends
 from fastapi_users import exceptions as fau_exc
 from fastapi_users import schemas
 from fastapi_users.authentication import (
@@ -12,6 +13,8 @@ from fastapi_users.manager import BaseUserManager
 from fastapi_users_db_sqlmodel import SQLModelUserDatabase
 from pydantic import EmailStr
 from sqlmodel import Session
+
+from .deps import get_db
 
 from .models import User
 
@@ -79,17 +82,17 @@ class UserManager(BaseUserManager[User, UUID]):
     async def on_after_forgot_password(self, user: User, token: str, request=None):
         print(f"User {user.email} forgot password. Token: {token}")
 
-    async def parse_id(self, value: str | UUID) -> UUID:  # type: ignore[override]
-        return UUID(str(value))
+    def parse_id(self, value: str | UUID) -> str:  # type: ignore[override]
+        return str(value)
 
 
 # Database dependency
-def get_user_db(session: Session):
+def get_user_db(session=Depends(get_db)):
     yield SQLModelUserDatabase(session, User)
 
 
 # User manager dependency
-async def get_user_manager(user_db: SQLModelUserDatabase):
+async def get_user_manager(user_db=Depends(get_user_db)):
     yield UserManager(user_db)
 
 

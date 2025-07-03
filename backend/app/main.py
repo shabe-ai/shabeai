@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_users import FastAPIUsers
 
-from app.auth import auth_backend, get_user_manager
+from app.auth import auth_backend, get_user_manager, UserRead, UserCreate, UserUpdate
 from app.chat_router import router as chat_router
 from app.database import init_db
 from app.logging_config import setup_logging
@@ -48,19 +48,17 @@ fastapi_users: FastAPIUsers = FastAPIUsers[User, UUID](
 )
 
 # ------------------- Auth routes ------------------- #
-# Temporarily commented out to debug FastAPI Users issue
-# app.include_router(
-#     fastapi_users.get_auth_router(auth_backend),
-#     prefix="/auth/jwt",
-#     tags=["auth"],
-# )
+app.include_router(
+    fastapi_users.get_auth_router(auth_backend),
+    prefix="/auth/jwt",
+    tags=["auth"],
+)
 
-# (If you later need register / verify / reset routers, use:)
-# app.include_router(
-#     fastapi_users.get_register_router(UserRead, UserCreate),
-#     prefix="/auth",
-#     tags=["auth"],
-# )
+app.include_router(
+    fastapi_users.get_register_router(UserRead, UserCreate),
+    prefix="/auth",
+    tags=["auth"],
+)
 
 # Include custom auth router
 app.include_router(auth.router, prefix="/custom-auth", tags=["custom-auth"])
@@ -73,6 +71,12 @@ app.include_router(chat_router, prefix="/api", tags=["chat"])
 
 # Include meta router for health and version endpoints
 app.include_router(meta.router)
+
+app.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["users"],
+)
 
 
 @app.get("/")
