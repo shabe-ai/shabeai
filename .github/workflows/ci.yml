@@ -75,7 +75,7 @@ jobs:
           DATABASE_URL: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
         run: |
           cd backend
-          poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=html --cov-fail-under=70
+          poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=html --cov-fail-under=80
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
