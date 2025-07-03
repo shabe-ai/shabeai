@@ -10,7 +10,7 @@ from app.database import init_db
 from app.logging_config import setup_logging
 from app.middleware.request_id import RequestIDMiddleware
 from app.models import User
-from app.routers import auth, lead, meta
+from app.routers import auth, lead, meta, company, deal, task
 
 # Setup structured logging
 setup_logging()
@@ -61,10 +61,19 @@ app.include_router(
 )
 
 # Include custom auth router
-app.include_router(auth.router, prefix="/custom-auth", tags=["custom-auth"])
+app.include_router(auth.router, prefix="/auth", tags=["custom-auth"])
 
 # Include leads router
 app.include_router(lead.router)
+
+# Include company router
+app.include_router(company.router)
+
+# Include deal router
+app.include_router(deal.router)
+
+# Include task router
+app.include_router(task.router)
 
 # Include chat router
 app.include_router(chat_router, prefix="/api", tags=["chat"])

@@ -11,7 +11,7 @@ from ..simple_auth import (
     verify_password,
 )
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(tags=["auth"])
 
 
 class UserLogin(BaseModel):

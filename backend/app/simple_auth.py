@@ -5,7 +5,7 @@ import bcrypt
 import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import HTTPBearer
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from .database import get_session
 from .models import User
@@ -54,6 +54,11 @@ def get_current_user(credentials=Depends(security), db=Depends(get_session)):
 
 def create_demo_user(db: Session):
     """Create the demo user if it doesn't exist."""
+    # Check if demo user already exists
+    existing_user = db.exec(select(User).where(User.email == "demo@example.com")).first()
+    if existing_user:
+        return existing_user
+    
     user = User(
         id=str(uuid.uuid4()),
         email="demo@example.com",

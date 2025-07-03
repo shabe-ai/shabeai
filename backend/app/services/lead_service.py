@@ -14,14 +14,28 @@ class LeadService:
         return self.session.get(Lead, lead_id)
 
     def create(self, lead_in):
-        lead = Lead(**lead_in.model_dump())
+        # Handle both Pydantic v1 and v2
+        if hasattr(lead_in, 'model_dump'):
+            lead_data = lead_in.model_dump()
+        elif hasattr(lead_in, 'dict'):
+            lead_data = lead_in.dict()
+        else:
+            lead_data = dict(lead_in)
+        lead = Lead(**lead_data)
         self.session.add(lead)
         self.session.commit()
         self.session.refresh(lead)
         return lead
 
     def update(self, db_lead, lead_update):
-        for k, v in lead_update.model_dump(exclude_unset=True).items():
+        # Handle both Pydantic v1 and v2
+        if hasattr(lead_update, 'model_dump'):
+            update_data = lead_update.model_dump(exclude_unset=True)
+        elif hasattr(lead_update, 'dict'):
+            update_data = lead_update.dict(exclude_unset=True)
+        else:
+            update_data = dict(lead_update)
+        for k, v in update_data.items():
             setattr(db_lead, k, v)
         self.session.add(db_lead)
         self.session.commit()
