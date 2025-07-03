@@ -135,6 +135,10 @@ jobs:
   # Security Scanning
   security:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -148,10 +152,11 @@ jobs:
           output: 'trivy-results.sarif'
 
       - name: Upload Trivy scan results to GitHub Security tab
+        if: success() && hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v3
-        if: always()
         with:
           sarif_file: 'trivy-results.sarif'
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Bandit security linter
         uses: actions/setup-python@v5
