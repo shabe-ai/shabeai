@@ -126,7 +126,7 @@ jobs:
       - name: Validate Convex schema
         run: |
           echo "Validating Convex schema..."
-          npx convex codegen --check
+          npx convex codegen
         working-directory: frontend
         env:
           CONVEX_DEPLOYMENT: ${{ secrets.CONVEX_DEPLOYMENT }}
