@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: string, pw: string) => Promise<unknown>, onSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +22,8 @@ export default function LoginForm({ onSubmit, onSuccess }: { onSubmit?: (email: 
           if (onSuccess) {
             onSuccess();
           } else {
-            router.push('/dashboard');
+            // Use window.location for navigation to avoid router dependency
+            window.location.href = '/dashboard';
           }
         } else {
           throw new Error('Invalid credentials');
