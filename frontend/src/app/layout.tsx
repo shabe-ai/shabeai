@@ -1,7 +1,7 @@
 import './globals.css';
 import { Metadata } from 'next';
 import { Figtree } from 'next/font/google';
-import ReactQueryProvider from '@/components/ReactQueryProvider';
+import { ConvexProvider, convex } from '@/lib/convex';
 import { cookies } from 'next/headers';
 
 const bodyFont = Figtree({ subsets:['latin'], weight:['400'] });
@@ -40,9 +40,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en" className={bodyFont.className}>
       <body className="min-h-screen">
-        <ReactQueryProvider initialData={initialData}>
+        <ConvexProvider client={convex}>
           {children}
-        </ReactQueryProvider>
+        </ConvexProvider>
       </body>
     </html>
   );

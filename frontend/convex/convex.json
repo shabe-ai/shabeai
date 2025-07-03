@@ -1,0 +1,20 @@
+{
+  "project": {
+    "name": "shabeai-crm"
+  },
+  "team": {
+    "name": "shabeai"
+  },
+  "prodUrl": "https://precious-eel-928.convex.cloud",
+  "functions": {
+    "codegen": {
+      "enabled": true
+    }
+  },
+  "authInfo": [
+    {
+      "domain": "clerk.com",
+      "applicationID": "your-clerk-app-id"
+    }
+  ]
+} 
