@@ -1,6 +1,15 @@
 import '@testing-library/jest-dom';
 import { beforeAll, afterEach, afterAll } from 'vitest';
 import { server } from './mocks/server';
+import { vi } from 'vitest';
+
+vi.mock('next/navigation', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    redirect: vi.fn(),
+  };
+});
 
 // Establish API mocking before all tests
 beforeAll(() => server.listen());
