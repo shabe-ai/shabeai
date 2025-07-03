@@ -1,5 +1,3 @@
-
-
 def test_health_check(client):
     """Test health check endpoint"""
     response = client.get("/health")
@@ -25,4 +23,4 @@ def test_root_endpoint(client):
     assert response.status_code == 200
     data = response.json()
     assert "message" in data
-    assert "Chat CRM API is running" in data["message"] 
+    assert "Chat CRM API is running" in data["message"]

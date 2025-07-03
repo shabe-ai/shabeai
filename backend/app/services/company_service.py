@@ -15,9 +15,9 @@ class CompanyService:
 
     def create(self, company_in):
         # Handle both Pydantic v1 and v2
-        if hasattr(company_in, 'model_dump'):
+        if hasattr(company_in, "model_dump"):
             company_data = company_in.model_dump()
-        elif hasattr(company_in, 'dict'):
+        elif hasattr(company_in, "dict"):
             company_data = company_in.dict()
         else:
             company_data = dict(company_in)
@@ -29,9 +29,9 @@ class CompanyService:
 
     def update(self, db_company, company_update):
         # Handle both Pydantic v1 and v2
-        if hasattr(company_update, 'model_dump'):
+        if hasattr(company_update, "model_dump"):
             update_data = company_update.model_dump(exclude_unset=True)
-        elif hasattr(company_update, 'dict'):
+        elif hasattr(company_update, "dict"):
             update_data = company_update.dict(exclude_unset=True)
         else:
             update_data = dict(company_update)

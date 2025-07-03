@@ -31,4 +31,4 @@ def test_create_task():
     assert response.status_code == 201
     task = response.json()
     assert task["title"] == "Coverage Task"
-    assert task["leadId"] == lead_id 
+    assert task["leadId"] == lead_id

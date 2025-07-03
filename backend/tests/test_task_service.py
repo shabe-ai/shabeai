@@ -7,27 +7,21 @@ from app.services.task_service import TaskService
 def test_task_service_list_tasks(session):
     """Test listing tasks through the service"""
     # Create a lead first
-    lead = Lead(
-        firstName="Test", lastName="Lead", email="testlead_list@example.com"
-    )
+    lead = Lead(firstName="Test", lastName="Lead", email="testlead_list@example.com")
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     # Create some tasks
     due_date = datetime.now() + timedelta(days=7)
     tasks = [
-        Task(
-            title="Task 1", dueDate=due_date, isDone=False, leadId=lead.id
-        ),
-        Task(
-            title="Task 2", dueDate=due_date, isDone=True, leadId=lead.id
-        ),
+        Task(title="Task 1", dueDate=due_date, isDone=False, leadId=lead.id),
+        Task(title="Task 2", dueDate=due_date, isDone=True, leadId=lead.id),
     ]
     for task in tasks:
         session.add(task)
     session.commit()
-    
+
     service = TaskService(session)
     all_tasks = service.list()
     assert len(all_tasks) >= 2
@@ -39,22 +33,18 @@ def test_task_service_list_tasks(session):
 def test_task_service_get_task(session):
     """Test getting a task by ID through the service"""
     # Create a lead first
-    lead = Lead(
-        firstName="Test", lastName="Lead 2", email="testlead_get@example.com"
-    )
+    lead = Lead(firstName="Test", lastName="Lead 2", email="testlead_get@example.com")
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     # Create a task
     due_date = datetime.now() + timedelta(days=5)
-    task = Task(
-        title="Test Task", dueDate=due_date, isDone=False, leadId=lead.id
-    )
+    task = Task(title="Test Task", dueDate=due_date, isDone=False, leadId=lead.id)
     session.add(task)
     session.commit()
     session.refresh(task)
-    
+
     service = TaskService(session)
     retrieved_task = service.get(task.id)
     assert retrieved_task.id == task.id
@@ -77,7 +67,7 @@ def test_task_service_create_task(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     service = TaskService(session)
     due_date = datetime.now() + timedelta(days=10)
     task_data = {
@@ -86,7 +76,7 @@ def test_task_service_create_task(session):
         "isDone": False,
         "leadId": lead.id,
     }
-    
+
     task = service.create(task_data)
     assert task.title == "New Task"
     assert task.leadId == lead.id
@@ -103,16 +93,14 @@ def test_task_service_update_task(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     # Create a task
     due_date = datetime.now() + timedelta(days=3)
-    task = Task(
-        title="Original Task", dueDate=due_date, isDone=False, leadId=lead.id
-    )
+    task = Task(title="Original Task", dueDate=due_date, isDone=False, leadId=lead.id)
     session.add(task)
     session.commit()
     session.refresh(task)
-    
+
     service = TaskService(session)
     new_due_date = datetime.now() + timedelta(days=15)
     update_data = {
@@ -120,7 +108,7 @@ def test_task_service_update_task(session):
         "dueDate": new_due_date,
         "isDone": True,
     }
-    
+
     updated_task = service.update(task, update_data)
     assert updated_task.title == "Updated Task"
     assert updated_task.isDone is True
@@ -135,19 +123,17 @@ def test_task_service_delete_task(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     # Create a task
     due_date = datetime.now() + timedelta(days=1)
-    task = Task(
-        title="Delete Me", dueDate=due_date, isDone=False, leadId=lead.id
-    )
+    task = Task(title="Delete Me", dueDate=due_date, isDone=False, leadId=lead.id)
     session.add(task)
     session.commit()
     session.refresh(task)
-    
+
     service = TaskService(session)
     service.delete(task)
-    
+
     # Verify it's deleted
     result = service.get(task.id)
-    assert result is None 
+    assert result is None

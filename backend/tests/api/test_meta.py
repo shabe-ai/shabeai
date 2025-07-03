@@ -17,4 +17,4 @@ def test_version():
     data = response.json()
     assert "version" in data
     assert "git" in data
-    assert "built_at" in data 
+    assert "built_at" in data

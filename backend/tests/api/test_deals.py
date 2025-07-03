@@ -27,4 +27,4 @@ def test_create_deal():
     assert response.status_code == 201
     deal = response.json()
     assert deal["title"] == "Coverage Deal"
-    assert deal["companyId"] == company_id 
+    assert deal["companyId"] == company_id

@@ -8,12 +8,12 @@ def test_lead_service_list_leads(session):
     # Create some leads
     leads = [
         Lead(firstName="Alice", lastName="Johnson", email="alice1@example.com"),
-        Lead(firstName="Bob", lastName="Brown", email="bob1@example.com")
+        Lead(firstName="Bob", lastName="Brown", email="bob1@example.com"),
     ]
     for lead in leads:
         session.add(lead)
     session.commit()
-    
+
     service = LeadService(session)
     all_leads = service.list()
     assert len(all_leads) >= 2
@@ -29,7 +29,7 @@ def test_lead_service_get_lead(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     service = LeadService(session)
     retrieved_lead = service.get(lead.id)
     assert retrieved_lead.id == lead.id
@@ -47,18 +47,16 @@ def test_lead_service_create_lead(session):
     """Test creating a lead through the service"""
     service = LeadService(session)
     lead_data = LeadCreate(
-        firstName="Jane",
-        lastName="Smith",
-        email="jane1@example.com"
+        firstName="Jane", lastName="Smith", email="jane1@example.com"
     )
-    
+
     # Convert to dict since the service expects model_dump()
     # lead_dict = {
     #     "firstName": lead_data.firstName,
     #     "lastName": lead_data.lastName,
     #     "email": lead_data.email
     # }
-    
+
     lead = service.create(lead_data)
     assert lead.firstName == "Jane"
     assert lead.email == "jane1@example.com"
@@ -72,13 +70,14 @@ def test_lead_service_update_lead(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     service = LeadService(session)
     from app.schemas.lead import LeadCreate
+
     update_data = LeadCreate(
         firstName="Updated", lastName="Name", email="updated1@example.com"
     )
-    
+
     updated_lead = service.update(lead, update_data)
     assert updated_lead.firstName == "Updated"
     assert updated_lead.email == "updated1@example.com"
@@ -91,10 +90,10 @@ def test_lead_service_delete_lead(session):
     session.add(lead)
     session.commit()
     session.refresh(lead)
-    
+
     service = LeadService(session)
     service.delete(lead)
-    
+
     # Verify it's deleted
     result = service.get(lead.id)
-    assert result is None 
+    assert result is None

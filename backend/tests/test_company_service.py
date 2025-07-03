@@ -7,12 +7,12 @@ def test_company_service_list_companies(session):
     # Create some companies
     companies = [
         Company(name="Acme Corp", website="https://acme.com"),
-        Company(name="Tech Solutions", website="https://techsolutions.com")
+        Company(name="Tech Solutions", website="https://techsolutions.com"),
     ]
     for company in companies:
         session.add(company)
     session.commit()
-    
+
     service = CompanyService(session)
     all_companies = service.list()
     assert len(all_companies) >= 2
@@ -28,7 +28,7 @@ def test_company_service_get_company(session):
     session.add(company)
     session.commit()
     session.refresh(company)
-    
+
     service = CompanyService(session)
     retrieved_company = service.get(company.id)
     assert retrieved_company.id == company.id
@@ -45,11 +45,8 @@ def test_company_service_get_company_not_found(session):
 def test_company_service_create_company(session):
     """Test creating a company through the service"""
     service = CompanyService(session)
-    company_data = {
-        "name": "New Company 1",
-        "website": "https://newcompany.com"
-    }
-    
+    company_data = {"name": "New Company 1", "website": "https://newcompany.com"}
+
     company = service.create(company_data)
     assert company.name == "New Company 1"
     assert company.website == "https://newcompany.com"
@@ -63,10 +60,10 @@ def test_company_service_update_company(session):
     session.add(company)
     session.commit()
     session.refresh(company)
-    
+
     service = CompanyService(session)
     update_data = {"name": "Updated 1", "website": "https://updated.com"}
-    
+
     updated_company = service.update(company, update_data)
     assert updated_company.name == "Updated 1"
     assert updated_company.website == "https://updated.com"
@@ -79,10 +76,10 @@ def test_company_service_delete_company(session):
     session.add(company)
     session.commit()
     session.refresh(company)
-    
+
     service = CompanyService(session)
     service.delete(company)
-    
+
     # Verify it's deleted
     result = service.get(company.id)
-    assert result is None 
+    assert result is None

@@ -1,5 +1,3 @@
-
-
 def test_auth_register_success(client):
     """Test successful user registration"""
     response = client.post(
@@ -41,7 +39,7 @@ def test_auth_login_success(client):
             "full_name": "Login User",
         },
     )
-    
+
     # Then login
     response = client.post(
         "/auth/jwt/login",
@@ -73,14 +71,14 @@ def test_auth_me_endpoint(client):
             "full_name": "Me User",
         },
     )
-    
+
     login_response = client.post(
         "/auth/jwt/login",
         data={"username": "me@example.com", "password": "testpass123"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     cookie = login_response.cookies.get("crm-auth")
-    
+
     # Test /users/me
     response = client.get("/users/me", cookies={"crm-auth": cookie})
     assert response.status_code == 200
@@ -105,14 +103,14 @@ def test_auth_logout(client):
             "full_name": "Logout User",
         },
     )
-    
+
     login_response = client.post(
         "/auth/jwt/login",
         data={"username": "logout@example.com", "password": "testpass123"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     cookie = login_response.cookies.get("crm-auth")
-    
+
     # Test logout
     response = client.post("/auth/jwt/logout", cookies={"crm-auth": cookie})
-    assert response.status_code == 204 
+    assert response.status_code == 204

@@ -60,7 +60,7 @@ def create_demo_user(db: Session):
     ).first()
     if existing_user:
         return existing_user
-    
+
     user = User(
         id=str(uuid.uuid4()),
         email="demo@example.com",

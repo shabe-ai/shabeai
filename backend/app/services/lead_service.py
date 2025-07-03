@@ -15,9 +15,9 @@ class LeadService:
 
     def create(self, lead_in):
         # Handle both Pydantic v1 and v2
-        if hasattr(lead_in, 'model_dump'):
+        if hasattr(lead_in, "model_dump"):
             lead_data = lead_in.model_dump()
-        elif hasattr(lead_in, 'dict'):
+        elif hasattr(lead_in, "dict"):
             lead_data = lead_in.dict()
         else:
             lead_data = dict(lead_in)
@@ -29,9 +29,9 @@ class LeadService:
 
     def update(self, db_lead, lead_update):
         # Handle both Pydantic v1 and v2
-        if hasattr(lead_update, 'model_dump'):
+        if hasattr(lead_update, "model_dump"):
             update_data = lead_update.model_dump(exclude_unset=True)
-        elif hasattr(lead_update, 'dict'):
+        elif hasattr(lead_update, "dict"):
             update_data = lead_update.dict(exclude_unset=True)
         else:
             update_data = dict(lead_update)

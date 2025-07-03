@@ -18,4 +18,4 @@ def test_list_users():
     assert response.status_code == 200
     users = response.json()
     assert isinstance(users, list)
-    assert any(user["email"] == "demo@example.com" for user in users) 
+    assert any(user["email"] == "demo@example.com" for user in users)

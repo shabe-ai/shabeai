@@ -15,9 +15,9 @@ class DealService:
 
     def create(self, deal_in):
         # Handle both Pydantic v1 and v2
-        if hasattr(deal_in, 'model_dump'):
+        if hasattr(deal_in, "model_dump"):
             deal_data = deal_in.model_dump()
-        elif hasattr(deal_in, 'dict'):
+        elif hasattr(deal_in, "dict"):
             deal_data = deal_in.dict()
         else:
             deal_data = dict(deal_in)
@@ -29,9 +29,9 @@ class DealService:
 
     def update(self, db_deal, deal_update):
         # Handle both Pydantic v1 and v2
-        if hasattr(deal_update, 'model_dump'):
+        if hasattr(deal_update, "model_dump"):
             update_data = deal_update.model_dump(exclude_unset=True)
-        elif hasattr(deal_update, 'dict'):
+        elif hasattr(deal_update, "dict"):
             update_data = deal_update.dict(exclude_unset=True)
         else:
             update_data = dict(deal_update)

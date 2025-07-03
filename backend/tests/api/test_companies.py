@@ -17,4 +17,4 @@ def test_create_company():
     assert response.status_code == 201
     company = response.json()
     assert company["name"] == "Coverage Co"
-    assert company["website"] == "https://coverageco.com" 
+    assert company["website"] == "https://coverageco.com"
