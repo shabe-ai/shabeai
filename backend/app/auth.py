@@ -1,8 +1,8 @@
 import os
 from uuid import UUID
 
-from fastapi_users import FastAPIUsers, schemas
 from fastapi_users import exceptions as fau_exc
+from fastapi_users import schemas
 from fastapi_users.authentication import (
     AuthenticationBackend,
     CookieTransport,
@@ -93,12 +93,4 @@ async def get_user_manager(user_db: SQLModelUserDatabase):
     yield UserManager(user_db)
 
 
-# FastAPI Users instance
-fastapi_users = FastAPIUsers[User, UUID](
-    get_user_manager,  # <- must be a callable dependency
-    [auth_backend],
-)
-
-current_active_user = fastapi_users.current_user(active=True)
-
-__all__ = ["fastapi_users", "get_user_manager", "UserManager", "current_active_user"]
+__all__ = ["get_user_manager", "UserManager"]

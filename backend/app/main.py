@@ -1,11 +1,15 @@
+from uuid import UUID
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_users import FastAPIUsers
 
-from app.auth import UserCreate, UserRead, UserUpdate, auth_backend, fastapi_users
+from app.auth import auth_backend, get_user_manager
 from app.chat_router import router as chat_router
 from app.database import init_db
 from app.logging_config import setup_logging
 from app.middleware.request_id import RequestIDMiddleware
+from app.models import User
 from app.routers import auth, lead, meta
 
 # Setup structured logging
@@ -33,25 +37,30 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include FastAPI Users routes
-app.include_router(
-    fastapi_users.get_auth_router(auth_backend),
-    prefix="/auth/jwt",
-    tags=["auth"],
+# --------------------------------------------------------------------------- #
+# FastAPI-Users setup                                                         #
+# --------------------------------------------------------------------------- #
+
+# Instantiate once so we can derive all feature routers from it.
+fastapi_users: FastAPIUsers = FastAPIUsers[User, UUID](
+    get_user_manager,
+    [auth_backend],
 )
-app.include_router(
-    fastapi_users.get_register_router(
-        user_schema=UserRead,
-        user_create_schema=UserCreate,
-    ),
-    prefix="/auth",
-    tags=["auth"],
-)
-app.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
-    tags=["users"],
-)
+
+# ------------------- Auth routes ------------------- #
+# Temporarily commented out to debug FastAPI Users issue
+# app.include_router(
+#     fastapi_users.get_auth_router(auth_backend),
+#     prefix="/auth/jwt",
+#     tags=["auth"],
+# )
+
+# (If you later need register / verify / reset routers, use:)
+# app.include_router(
+#     fastapi_users.get_register_router(UserRead, UserCreate),
+#     prefix="/auth",
+#     tags=["auth"],
+# )
 
 # Include custom auth router
 app.include_router(auth.router, prefix="/custom-auth", tags=["custom-auth"])
