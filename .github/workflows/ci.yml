@@ -58,7 +58,12 @@ jobs:
         working-directory: frontend
 
       - name: Build frontend
-        run: pnpm build
+        run: |
+          if [ -z "$NEXT_PUBLIC_CONVEX_URL" ]; then
+            echo "Error: NEXT_PUBLIC_CONVEX_URL is missing"
+            exit 1
+          fi
+          pnpm build
         working-directory: frontend
         env:
           NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
@@ -154,7 +159,12 @@ jobs:
         working-directory: frontend
 
       - name: Build frontend for production
-        run: pnpm build
+        run: |
+          if [ -z "$NEXT_PUBLIC_CONVEX_URL" ]; then
+            echo "Error: NEXT_PUBLIC_CONVEX_URL is missing"
+            exit 1
+          fi
+          pnpm build
         working-directory: frontend
         env:
           NEXT_PUBLIC_CONVEX_URL: ${{ secrets.CONVEX_URL_PROD }}
