@@ -4,11 +4,10 @@ import { server } from './mocks/server';
 import { vi } from 'vitest';
 
 vi.mock('next/navigation', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
+  const actual = await importOriginal<typeof import('next/navigation')>();
+  return Object.assign({}, actual, {
     redirect: vi.fn(),
-  };
+  });
 });
 
 // Establish API mocking before all tests
