@@ -109,29 +109,24 @@ jobs:
             pnpm-${{ runner.os }}-
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
+        working-directory: frontend
 
       - name: Run linting
-        run: |
-          cd frontend
-          pnpm lint
+        run: pnpm lint
+        working-directory: frontend
 
       - name: Run type checking
-        run: |
-          cd frontend
-          pnpm type-check
+        run: pnpm type-check
+        working-directory: frontend
 
       - name: Run tests
-        run: |
-          cd frontend
-          pnpm test:ci
+        run: pnpm test:ci
+        working-directory: frontend
 
       - name: Build frontend
-        run: |
-          cd frontend
-          pnpm build
+        run: pnpm build
+        working-directory: frontend
 
   # Security Scanning
   security:
@@ -185,9 +180,9 @@ jobs:
 
       - name: Build and test frontend image
         run: |
-          cd frontend
           docker build -t shabeai-frontend:test .
           docker run --rm shabeai-frontend:test echo "Frontend build successful"
+        working-directory: frontend
 
   # Integration Tests
   integration-tests:
