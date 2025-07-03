@@ -3,13 +3,18 @@ import { http, HttpResponse } from 'msw';
 
 // Define handlers that correspond to your API endpoints
 export const handlers = [
+  http.get('http://localhost:8000/api/users/me', () => {
+    return HttpResponse.json({
+      id: 'test-user',
+      email: 'test@example.com',
+      full_name: 'Test User',
+    });
+  }),
   http.get('http://localhost:8000/users/me', () => {
     return HttpResponse.json({
-      id: '1',
+      id: 'test-user',
       email: 'test@example.com',
-      is_active: true,
-      is_superuser: false,
-      is_verified: true,
+      full_name: 'Test User',
     });
   }),
 ];

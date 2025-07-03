@@ -1,35 +1,28 @@
-import axios from 'axios';
-import { useQuery } from '@tanstack/react-query';
+import http from './http';
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000',
-  withCredentials: true, // ← include crm-auth cookie
-});
-
-// Global error interceptor for 401/403 responses
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      // Clear auth cookie
-      document.cookie = 'crm-auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-      // Redirect to login
-      if (typeof window !== 'undefined') {
-        window.location.href = '/login';
-      }
-    }
-    return Promise.reject(error);
-  }
-);
-
-export const login = (email: string, pw: string) => 
-  api.post('/auth/jwt/login', `username=${email}&password=${pw}`, { 
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' } 
-  });
-
-export const currentUser = () => api.get('/users/me');
-
-export const logout = () => api.post('/auth/jwt/logout');
-
-export const useCurrentUser = () =>
-  useQuery({ queryKey: ['me'], queryFn: currentUser, staleTime: 30 * 60 * 1000 }); 
+export const api = {
+  async me() {
+    const res = await http.get('/users/me');
+    return res.data;
+  },
+  
+  async get<T>(url: string) {
+    const res = await http.get<T>(url);
+    return res;
+  },
+  
+  async post<T>(url: string, data?: unknown) {
+    const res = await http.post<T>(url, data);
+    return res;
+  },
+  
+  async put<T>(url: string, data?: unknown) {
+    const res = await http.put<T>(url, data);
+    return res;
+  },
+  
+  async delete<T>(url: string) {
+    const res = await http.delete<T>(url);
+    return res;
+  },
+}; 

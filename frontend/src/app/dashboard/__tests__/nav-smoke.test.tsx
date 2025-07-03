@@ -11,6 +11,18 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useCurrentUser', () => ({
+  useCurrentUser: () => ({
+    data: {
+      id: 'test-user',
+      email: 'test@example.com',
+      full_name: 'Test User',
+    },
+    error: null,
+    isLoading: false,
+  }),
+}));
+
 // MSW setup is assumed to be in setupTests.ts and mocks/server.ts
 
 describe('Dashboard navigation', () => {
@@ -26,11 +38,11 @@ describe('Dashboard navigation', () => {
     );
 
     // Wait for nav links to appear
-    const pipelineLink = await screen.findByRole('link', { name: /pipeline/i });
+    const pipelineLink = await screen.findByRole('link', { name: /Pipeline/i });
     expect(pipelineLink).toBeInTheDocument();
     expect(pipelineLink).toHaveAttribute('href', '/dashboard/pipeline');
-    expect(screen.getByRole('link', { name: /tasks/i })).toHaveAttribute('href', '/dashboard/tasks');
-    expect(screen.getByRole('link', { name: /chat/i })).toHaveAttribute('href', '/dashboard/chat');
-    expect(screen.getByRole('link', { name: /settings/i })).toHaveAttribute('href', '/dashboard/settings');
+    expect(screen.getByRole('link', { name: /Tasks/i })).toHaveAttribute('href', '/dashboard/tasks');
+    expect(screen.getByRole('link', { name: /Chat/i })).toHaveAttribute('href', '/dashboard/chat');
+    expect(screen.getByRole('link', { name: /Settings/i })).toHaveAttribute('href', '/dashboard/settings');
   });
 }); 

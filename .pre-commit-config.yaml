@@ -1,0 +1,19 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: "v0.4.4"
+    hooks: [{ id: ruff, args: ["--fix"] }]
+
+  - repo: local
+    hooks:
+      - id: frontend-lint
+        name: "pnpm lint & type-check"
+        entry: bash -c "pnpm lint && pnpm type-check"
+        language: system
+
+      - id: frontend-tests
+        entry: pnpm test:ci
+        language: system
+
+      - id: backend-tests
+        entry: poetry run pytest -q
+        language: system
