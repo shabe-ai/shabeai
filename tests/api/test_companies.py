@@ -148,8 +148,8 @@ class TestCompanyRelationships:
     def test_company_with_leads(self, client, auth_headers, session):
         """Test company can have associated leads."""
         company = CompanyFactory.create_model(session)
-        lead1 = LeadFactory.create_model(session, companyId=company.id)
-        lead2 = LeadFactory.create_model(session, companyId=company.id)
+        LeadFactory.create_model(session, companyId=company.id)
+        LeadFactory.create_model(session, companyId=company.id)
         
         response = client.get(f"/companies/{company.id}", headers=auth_headers)
         
@@ -160,8 +160,8 @@ class TestCompanyRelationships:
     def test_company_with_deals(self, client, auth_headers, session):
         """Test company can have associated deals."""
         company = CompanyFactory.create_model(session)
-        deal1 = DealFactory.create_model(session, company.id)
-        deal2 = DealFactory.create_model(session, company.id)
+        DealFactory.create_model(session, company.id)
+        DealFactory.create_model(session, company.id)
         
         response = client.get(f"/companies/{company.id}", headers=auth_headers)
         
