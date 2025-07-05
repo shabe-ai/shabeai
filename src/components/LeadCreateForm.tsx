@@ -1,0 +1,6 @@
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+// ... existing code ...
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const createLead = useMutation((api as any)['leads/mutations'].createLead);
+// ... existing code ... 
