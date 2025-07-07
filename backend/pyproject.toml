@@ -37,7 +37,7 @@ pytest-mock = "^3.14.1"
 factory-boy = "^3.3.3"
 sqlalchemy-utils = "^0.41.2"
 mypy = "^1.10.0"
-bandit = "^1.7.8"
+bandit = "^1.8.6"
 
 [build-system]
 requires = ["poetry-core"]
