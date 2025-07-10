@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
   // Example: handle subscription events (add your Convex mutation call as needed)
   if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
-    const sub = event.data.object as Stripe.Subscription;
+    // const sub = event.data.object as Stripe.Subscription;
     // await convex.mutation(internal.billing.upsertSubscription, {
     //   customerId: sub.customer as string,
     //   subId: sub.id,
