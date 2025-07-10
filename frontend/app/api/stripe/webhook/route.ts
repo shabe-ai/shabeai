@@ -3,10 +3,10 @@ import Stripe from 'stripe';
 // import { internal } from '@/convex/_generated/api';
 // import { ConvexHttpClient } from 'convex/browser';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
-// const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
-
 export async function POST(req: NextRequest) {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-06-30.basil' });
+  // const convex = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
   const sig = req.headers.get('stripe-signature')!;
   const body = await req.text();
 
