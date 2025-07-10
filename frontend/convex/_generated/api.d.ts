@@ -13,6 +13,9 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as billing_actions from "../billing/actions.js";
+import type * as billing_queries from "../billing/queries.js";
+import type * as billing from "../billing.js";
 import type * as companies from "../companies.js";
 
 /**
@@ -24,6 +27,9 @@ import type * as companies from "../companies.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  "billing/actions": typeof billing_actions;
+  "billing/queries": typeof billing_queries;
+  billing: typeof billing;
   companies: typeof companies;
 }>;
 export declare const api: FilterApi<
