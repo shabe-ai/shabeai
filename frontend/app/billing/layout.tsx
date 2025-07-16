@@ -1,13 +1,16 @@
 "use client";
 import type { ReactNode } from 'react';
+import { ConvexClientProvider } from '../../src/lib/convex';
+import { AppProviders } from '../../src/app/providers';
 
 export default function BillingLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen flex flex-col items-center">
-      <header className="w-full border-b p-4 text-center font-semibold">
-        Billing
-      </header>
-      <main className="flex-1 w-full max-w-xl p-6">{children}</main>
-    </div>
+    <html lang="en">
+      <body>
+        <ConvexClientProvider>
+          <AppProviders>{children}</AppProviders>
+        </ConvexClientProvider>
+      </body>
+    </html>
   );
 } 
