@@ -1,0 +1,15 @@
+{
+  "projects": {},
+  "buildCommand": "pnpm --filter frontend build",
+  "outputDirectory": "frontend/.next",
+  "framework": "nextjs",
+  "ignoreCommand": "echo 'Using Docker locally; skip in Vercel'",
+  "rootDirectory": "frontend",
+  "env": {
+    "NEXT_PUBLIC_CONVEX_URL": "@next_public_convex_url",
+    "NEXT_PUBLIC_BASE_URL": "@next_public_base_url",
+    "NEXT_PUBLIC_STRIPE_PRICE_ID": "@next_public_stripe_price_id",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key",
+    "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret"
+  }
+} 

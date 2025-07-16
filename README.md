@@ -2,6 +2,22 @@
 
 A modern CRM built with FastAPI backend and Next.js frontend.
 
+### Production deployment (Vercel + Convex Cloud)
+
+1. **Create a Vercel project** and select the `frontend` folder as root.  
+2. Add the env vars shown below.  
+3. Every push to **main** auto-deploys.
+
+Required env vars:
+
+| Key | Where to get it |
+| --- | --------------- |
+| `NEXT_PUBLIC_CONVEX_URL` | Convex dashboard → Deployments |
+| `NEXT_PUBLIC_BASE_URL`   | Your Vercel domain (`https://app.shabe.ai`) |
+| `NEXT_PUBLIC_STRIPE_PRICE_ID` | Stripe dashboard → Products |
+| `STRIPE_SECRET_KEY` | Stripe dashboard → Developers → API keys |
+| `STRIPE_WEBHOOK_SECRET` | `stripe listen --print-secret` |
+
 ## Quick Start with Docker
 
 The easiest way to get started is using Docker Compose:
