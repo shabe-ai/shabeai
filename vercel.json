@@ -3,7 +3,6 @@
   "outputDirectory": "frontend/.next",
   "framework": "nextjs",
   "ignoreCommand": "echo 'Using Docker locally; skip in Vercel'",
-  "rootDirectory": "frontend",
   "env": {
     "NEXT_PUBLIC_CONVEX_URL": "@next_public_convex_url",
     "NEXT_PUBLIC_BASE_URL": "@next_public_base_url",
