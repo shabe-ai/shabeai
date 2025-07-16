@@ -15,6 +15,7 @@ import type {
 } from "convex/server";
 import type * as billing_actions from "../billing/actions.js";
 import type * as billing_queries from "../billing/queries.js";
+import type * as leads_queries from "../leads/queries.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -27,6 +28,7 @@ import type * as billing_queries from "../billing/queries.js";
 declare const fullApi: ApiFromModules<{
   "billing/actions": typeof billing_actions;
   "billing/queries": typeof billing_queries;
+  "leads/queries": typeof leads_queries;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

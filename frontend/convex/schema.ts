@@ -27,10 +27,13 @@ export default defineSchema({
     phone: v.optional(v.string()),
     linkedinUrl: v.optional(v.string()),
     companyId: v.optional(v.id("companies")),
+    ownerId: v.string(),
+    status: v.optional(v.string()),
     createdAt: v.number(),
   })
     .index("by_email", ["email"])
-    .index("by_company", ["companyId"]),
+    .index("by_company", ["companyId"])
+    .index("by_owner", ["ownerId"]),
 
   deals: defineTable({
     title: v.string(),
