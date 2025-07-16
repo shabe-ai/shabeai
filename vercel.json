@@ -1,5 +1,4 @@
 {
-  "projects": {},
   "buildCommand": "pnpm --filter frontend build",
   "outputDirectory": "frontend/.next",
   "framework": "nextjs",
