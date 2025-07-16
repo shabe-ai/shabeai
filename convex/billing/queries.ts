@@ -22,4 +22,25 @@ export const upsertSubscription = mutation({
       });
     }
   },
+});
+
+// ── getUserStatus -------------------------------------------------
+import { query } from '../_generated/server';
+
+export const getUserStatus = query({
+  args: { userId: v.string() },
+  handler: async (ctx, { userId }) => {
+    const doc = await ctx.db
+      .query('billing')
+      .withIndex('by_user', (q) => q.eq('userId', userId))
+      .unique();
+    if (!doc) {
+      // brand-new user: 14-day trial starts now
+      return {
+        status: 'trialing',
+        trialEndsAt: Date.now() + 14 * 24 * 3600 * 1000,
+      };
+    }
+    return { status: doc.status, trialEndsAt: doc.trialEndsAt };
+  },
 }); 
