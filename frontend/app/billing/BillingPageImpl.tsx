@@ -1,5 +1,5 @@
 "use client";
-import CheckoutButton from '../../components/CheckoutButton';
+import CheckoutButton from '@/components/CheckoutButton';
 
 export default function BillingPageImpl() {
   return (
