@@ -1,6 +1,4 @@
-import defineSchema from 'convex/schema';
-import defineTable from 'convex/schema';
-import { v } from 'convex/values';
+import { defineSchema, defineTable, v } from 'convex/schema';
 
 export default defineSchema({
   users: defineTable({              // placeholder to satisfy foreign keys
