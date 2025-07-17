@@ -8,7 +8,8 @@ export async function middleware(req: NextRequest) {
   }
 
   // Pass session/user info via header; here we stub as 'demo-user'
-  const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/billing/status`, {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || req.nextUrl.origin;
+  const res = await fetch(`${baseUrl}/api/billing/status`, {
     headers: { 'x-auth-id': 'demo-user' },
   });
 
